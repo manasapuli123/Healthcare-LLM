@@ -2,7 +2,6 @@ import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
 from pypdf import PdfReader
-import os
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -16,10 +15,6 @@ st.set_page_config(
     page_icon="🩺",
     layout="centered"
 )
-
-# ---------------------------
-# DEMO INSTRUCTION
-# ---------------------------
 
 st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assistant.")
 
@@ -140,55 +135,101 @@ st.markdown(
 unsafe_allow_html=True
 )
 
+# ---------------------------
+# SAMPLE CLINICAL NOTES
+# ---------------------------
+
 sample_notes = """
-Patient Name: John Doe
-Age: 56
+Patient Name: John Smith
+Age: 58
 Chief Complaint: Chest pain and shortness of breath
 
 Medical History:
-Hypertension, Type 2 Diabetes
+Hypertension
+Type 2 Diabetes
+Hyperlipidemia
 
 Medications:
-Metformin 500mg
-Lisinopril 10mg
+Metformin 500 mg twice daily
+Lisinopril 10 mg daily
+Atorvastatin 20 mg daily
 
-Recent Labs:
-Blood Pressure: 150/95
-HbA1c: 7.8
-LDL Cholesterol: 140
+Lab Results:
+LDL Cholesterol: 145 mg/dL
+HbA1c: 7.9%
 
 Physician Notes:
-Patient reports intermittent chest discomfort for the past 2 days.
-Recommend cardiac evaluation and ECG.
+Patient reports intermittent chest discomfort during mild exertion.
+Recommend ECG and cardiology follow-up.
 """
 
+if "clinical_notes" not in st.session_state:
+    st.session_state.clinical_notes = ""
+
 if st.button("Load Sample Clinical Notes"):
-    clinical_notes = sample_notes
+    st.session_state.clinical_notes = sample_notes
 
 # ---------------------------
-# CLINICAL NOTES
+# CLINICAL NOTES INPUT
 # ---------------------------
-
-clinical_notes = st.text_area(
-    "Paste Clinical Notes",
-    height=200
-)
 
 uploaded_file = st.file_uploader("Upload Medical Report (PDF)", type="pdf")
 
 if uploaded_file:
 
     reader = PdfReader(uploaded_file)
+    text = ""
 
     for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            clinical_notes += text
+        page_text = page.extract_text()
+        if page_text:
+            text += page_text
 
-notes_input = st.text_area("Or paste clinical notes")
+    st.session_state.clinical_notes = text
 
-if notes_input:
-    clinical_notes = notes_input
+clinical_notes = st.text_area(
+    "Paste Clinical Notes",
+    value=st.session_state.clinical_notes,
+    height=200
+)
+
+st.session_state.clinical_notes = clinical_notes
+
+# ---------------------------
+# GENERATE SUMMARY
+# ---------------------------
+
+if st.button("Generate Clinical Summary"):
+
+    if clinical_notes == "":
+        st.warning("Please upload or paste clinical notes first.")
+
+    else:
+
+        prompt = f"""
+You are a clinical AI assistant.
+
+Summarize the following clinical notes into:
+
+• Patient Summary
+• Diagnosis
+• Medications
+• Lab Results
+• Follow-up Recommendations
+
+Clinical Notes:
+{clinical_notes}
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        summary = response.choices[0].message.content
+
+        st.subheader("Generated Clinical Summary")
+        st.write(summary)
 
 # ---------------------------
 # CHAT MEMORY
