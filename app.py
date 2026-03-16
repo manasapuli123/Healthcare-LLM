@@ -38,11 +38,10 @@ st.markdown("""
 }
 
 .chat-container {
-    height:450px;
-    overflow-y:auto;
     padding:15px;
     background:white;
     border-radius:10px;
+    margin-top:10px;
 }
 
 .user-msg {
@@ -118,7 +117,7 @@ st.sidebar.write("""
 Upload patient notes and chat with the assistant.
 
 Powered by:
-• FAISS RAG
+• FAISS RAG  
 • OpenAI LLM
 """)
 
@@ -242,8 +241,6 @@ if "messages" not in st.session_state:
 # DISPLAY CHAT
 # ---------------------------
 
-st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-
 if st.session_state.messages:
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
@@ -251,12 +248,14 @@ if st.session_state.messages:
     for msg in st.session_state.messages:
 
         if msg["role"] == "user":
+
             st.markdown(
                 f'<div class="user-msg">🧑 {msg["content"]}</div>',
                 unsafe_allow_html=True
             )
 
         else:
+
             st.markdown(
                 f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
                 unsafe_allow_html=True
@@ -264,27 +263,14 @@ if st.session_state.messages:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    if msg["role"] == "user":
-
-        st.markdown(
-            f'<div class="user-msg">🧑 {msg["content"]}</div>',
-            unsafe_allow_html=True
-        )
-
-    else:
-
-        st.markdown(
-            f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
-            unsafe_allow_html=True
-        )
-
-st.markdown('</div>', unsafe_allow_html=True)
-
 # ---------------------------
 # CHAT INPUT
 # ---------------------------
 
-user_input = st.chat_input("Ask a question about the patient")
+if not st.session_state.messages:
+    st.info("Ask a question about the patient using the chat below.")
+
+user_input = st.chat_input("Ask the Clinical AI Assistant...")
 
 if user_input:
 
