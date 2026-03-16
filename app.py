@@ -244,7 +244,25 @@ if "messages" not in st.session_state:
 
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-for msg in st.session_state.messages:
+if st.session_state.messages:
+
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
+    for msg in st.session_state.messages:
+
+        if msg["role"] == "user":
+            st.markdown(
+                f'<div class="user-msg">🧑 {msg["content"]}</div>',
+                unsafe_allow_html=True
+            )
+
+        else:
+            st.markdown(
+                f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
+                unsafe_allow_html=True
+            )
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if msg["role"] == "user":
 
