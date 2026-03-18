@@ -38,9 +38,7 @@ st.markdown("""
 }
 
 .chat-container {
-    padding:15px;
-    background:white;
-    border-radius:12px;
+    padding:10px;
     margin-top:10px;
 }
 
@@ -251,8 +249,6 @@ if "edit_index" not in st.session_state:
 
 if len(st.session_state.messages) > 0:
 
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-
     for i, msg in enumerate(st.session_state.messages):
 
         if msg["role"] == "user":
@@ -275,8 +271,6 @@ if len(st.session_state.messages) > 0:
                 f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
                 unsafe_allow_html=True
             )
-
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------
 # EDIT QUESTION
