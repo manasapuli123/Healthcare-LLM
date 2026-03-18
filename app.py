@@ -25,6 +25,8 @@ st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assist
 st.markdown("""
 <style>
 
+/* App background */
+
 .stApp {
     background-color:#eaf7f4;
 }
@@ -39,10 +41,26 @@ st.markdown("""
     font-weight:bold;
 }
 
-/* Text visibility fix */
+/* Global text */
 
-body, p, li, span, div {
+body, p, span, div, label {
     color:#1a1a1a !important;
+}
+
+/* Buttons */
+
+.stButton>button {
+    background-color:#3aafa9;
+    color:white !important;
+    border-radius:8px;
+    border:none;
+    padding:10px 16px;
+    font-weight:500;
+}
+
+.stButton>button:hover {
+    background-color:#2f8f89;
+    color:white !important;
 }
 
 /* Chat bubbles */
@@ -67,36 +85,30 @@ body, p, li, span, div {
     max-width:70%;
 }
 
-/* Dark mode support */
+/* Textarea */
+
+textarea {
+    border:2px solid black !important;
+    color:#000 !important;
+}
+
+/* Force consistent appearance in dark mode */
 
 @media (prefers-color-scheme: dark) {
 
 .stApp {
-    background-color:#1e1e1e;
+    background-color:#eaf7f4;
 }
 
-body, p, li, span, div {
-    color:#f5f5f5 !important;
+body, p, span, div, label {
+    color:#1a1a1a !important;
 }
 
-.user-msg {
-    background:#3a7f5f;
-    color:#ffffff !important;
-}
-
-.bot-msg {
-    background:#444444;
-    color:#ffffff !important;
-}
-
-textarea {
+.stButton>button {
+    background-color:#3aafa9 !important;
     color:white !important;
 }
 
-}
-
-textarea {
-    border:2px solid black !important;
 }
 
 </style>
