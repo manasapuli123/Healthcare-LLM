@@ -29,6 +29,8 @@ st.markdown("""
     background-color:#eaf7f4;
 }
 
+/* Header */
+
 .header {
     background-color:#3aafa9;
     padding:15px;
@@ -37,13 +39,21 @@ st.markdown("""
     font-weight:bold;
 }
 
+/* Text visibility fix */
+
+body, p, li, span, div {
+    color:#1a1a1a !important;
+}
+
+/* Chat bubbles */
+
 .user-msg {
     background:#DCF8C6;
     padding:12px;
     border-radius:12px;
     margin:8px;
     text-align:right;
-    color:#000;
+    color:#000 !important;
     max-width:70%;
     margin-left:auto;
 }
@@ -53,8 +63,36 @@ st.markdown("""
     padding:12px;
     border-radius:12px;
     margin:8px;
-    color:#000;
+    color:#000 !important;
     max-width:70%;
+}
+
+/* Dark mode support */
+
+@media (prefers-color-scheme: dark) {
+
+.stApp {
+    background-color:#1e1e1e;
+}
+
+body, p, li, span, div {
+    color:#f5f5f5 !important;
+}
+
+.user-msg {
+    background:#3a7f5f;
+    color:#ffffff !important;
+}
+
+.bot-msg {
+    background:#444444;
+    color:#ffffff !important;
+}
+
+textarea {
+    color:white !important;
+}
+
 }
 
 textarea {
