@@ -242,22 +242,32 @@ Clinical Notes:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+if "edit_index" not in st.session_state:
+    st.session_state.edit_index = None
+
 # ---------------------------
 # DISPLAY CHAT
 # ---------------------------
 
-if st.session_state.messages:
+if len(st.session_state.messages) > 0:
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-    for msg in st.session_state.messages:
+    for i, msg in enumerate(st.session_state.messages):
 
         if msg["role"] == "user":
 
-            st.markdown(
-                f'<div class="user-msg">🧑 {msg["content"]}</div>',
-                unsafe_allow_html=True
-            )
+            col1, col2 = st.columns([8,1])
+
+            with col1:
+                st.markdown(
+                    f'<div class="user-msg">🧑 {msg["content"]}</div>',
+                    unsafe_allow_html=True
+                )
+
+            with col2:
+                if st.button("✏️", key=f"edit_{i}"):
+                    st.session_state.edit_index = i
 
         else:
 
@@ -267,6 +277,27 @@ if st.session_state.messages:
             )
 
     st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------------------------
+# EDIT QUESTION
+# ---------------------------
+
+if st.session_state.edit_index is not None:
+
+    edit_text = st.text_input(
+        "Edit your question",
+        value=st.session_state.messages[st.session_state.edit_index]["content"]
+    )
+
+    if st.button("Resubmit Question"):
+
+        st.session_state.messages[st.session_state.edit_index]["content"] = edit_text
+
+        if len(st.session_state.messages) > st.session_state.edit_index + 1:
+            st.session_state.messages.pop(st.session_state.edit_index + 1)
+
+        st.session_state.edit_index = None
+        st.rerun()
 
 # ---------------------------
 # CHAT INPUT
