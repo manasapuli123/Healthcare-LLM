@@ -24,13 +24,11 @@ st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assist
 st.markdown("""
 <style>
 
-/* App background */
+/* ---------- BASE UI ---------- */
 
 .stApp {
     background-color:#eaf7f4;
 }
-
-/* Header */
 
 .header {
     background-color:#3aafa9;
@@ -40,17 +38,11 @@ st.markdown("""
     font-weight:bold;
 }
 
-/* Global text */
-
-body, p, span, div, label {
-    color:#1a1a1a;
-}
-
-/* Fix buttons */
+/* Buttons */
 
 .stButton>button {
     background-color:#3aafa9;
-    color:white !important;
+    color:white;
     border-radius:8px;
     border:none;
     padding:10px 16px;
@@ -59,19 +51,61 @@ body, p, span, div, label {
 
 .stButton>button:hover {
     background-color:#2f8f89;
-    color:white !important;
 }
 
-/* Fix text areas */
+/* Chat bubbles */
+
+.user-msg {
+    background:#DCF8C6;
+    padding:12px;
+    border-radius:12px;
+    margin:8px;
+    text-align:right;
+    color:black;
+    max-width:70%;
+    margin-left:auto;
+}
+
+.bot-msg {
+    background:#F1F0F0;
+    padding:12px;
+    border-radius:12px;
+    margin:8px;
+    color:black;
+    max-width:70%;
+}
+
+/* ---------- LIGHT MODE ---------- */
+
+@media (prefers-color-scheme: light) {
+
+body, p, span, div, label {
+    color:#1a1a1a;
+}
 
 textarea {
-    border:2px solid black !important;
-    color:white !important;
+    color:#1a1a1a;
 }
 
-/* File uploader */
+[data-testid="stFileUploader"] span {
+    color:#1a1a1a;
+}
 
-[data-testid="stFileUploader"] {
+[data-testid="stChatInput"] textarea {
+    color:#1a1a1a;
+}
+
+}
+
+/* ---------- DARK MODE ---------- */
+
+@media (prefers-color-scheme: dark) {
+
+body, p, span, div, label {
+    color:white;
+}
+
+textarea {
     color:white !important;
 }
 
@@ -83,60 +117,18 @@ textarea {
     color:white !important;
 }
 
-/* Drag and drop text */
-
 [data-testid="stFileUploaderDropzone"] {
     color:white !important;
 }
-
-[data-testid="stFileUploaderDropzone"] span {
-    color:white !important;
-}
-
-/* Chat input */
 
 [data-testid="stChatInput"] textarea {
     color:white !important;
 }
 
-/* Chat bubbles */
-
-.user-msg {
-    background:#DCF8C6;
-    padding:12px;
-    border-radius:12px;
-    margin:8px;
-    text-align:right;
-    color:black !important;
-    max-width:70%;
-    margin-left:auto;
-}
-
-.bot-msg {
-    background:#F1F0F0;
-    padding:12px;
-    border-radius:12px;
-    margin:8px;
-    color:black !important;
-    max-width:70%;
-}
-
-/* Top navigation icons (>>, share, deploy) */
+/* Top Streamlit icons */
 
 header, header * {
     color:white !important;
-}
-
-/* Force dark mode compatibility */
-
-@media (prefers-color-scheme: dark) {
-
-.stApp {
-    background-color:#eaf7f4;
-}
-
-body, p, span, div, label {
-    color:#1a1a1a !important;
 }
 
 }
