@@ -101,34 +101,67 @@ textarea {
 
 @media (prefers-color-scheme: dark) {
 
+/* Global text */
+
 body, p, span, div, label {
-    color:white;
+    color: white !important;
 }
+
+/* Text area */
 
 textarea {
-    color:white !important;
+    color: white !important;
 }
 
-[data-testid="stFileUploader"] span {
-    color:white !important;
-}
-
-[data-testid="stFileUploader"] button {
-    color:white !important;
-}
-
-[data-testid="stFileUploaderDropzone"] {
-    color:white !important;
-}
+/* Chat input */
 
 [data-testid="stChatInput"] textarea {
-    color:white !important;
+    color: white !important;
 }
 
-/* Top Streamlit icons */
+/* Drag & Drop uploader */
+
+[data-testid="stFileUploaderDropzone"] {
+    color: white !important;
+}
+
+[data-testid="stFileUploaderDropzone"] span {
+    color: white !important;
+}
+
+[data-testid="stFileUploaderDropzone"] div {
+    color: white !important;
+}
+
+/* Browse files button */
+
+[data-testid="stFileUploader"] button {
+    color: white !important;
+    border-color: white !important;
+}
+
+/* Upload helper text */
+
+[data-testid="stFileUploader"] small {
+    color: white !important;
+}
+
+/* Upload icon */
+
+[data-testid="stFileUploader"] svg {
+    color: white !important;
+}
+
+/* Top Streamlit toolbar (>>, Share, Deploy icons) */
 
 header, header * {
-    color:white !important;
+    color: white !important;
+}
+
+/* Chat placeholder */
+
+[data-testid="stChatInput"] input::placeholder {
+    color: white !important;
 }
 
 }
