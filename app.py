@@ -21,7 +21,6 @@ st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assist
 # ---------------------------
 # STYLING
 # ---------------------------
-
 st.markdown("""
 <style>
 
@@ -44,10 +43,10 @@ st.markdown("""
 /* Global text */
 
 body, p, span, div, label {
-    color:#1a1a1a !important;
+    color:#1a1a1a;
 }
 
-/* Buttons */
+/* Fix buttons */
 
 .stButton>button {
     background-color:#3aafa9;
@@ -63,6 +62,43 @@ body, p, span, div, label {
     color:white !important;
 }
 
+/* Fix text areas */
+
+textarea {
+    border:2px solid black !important;
+    color:white !important;
+}
+
+/* File uploader */
+
+[data-testid="stFileUploader"] {
+    color:white !important;
+}
+
+[data-testid="stFileUploader"] span {
+    color:white !important;
+}
+
+[data-testid="stFileUploader"] button {
+    color:white !important;
+}
+
+/* Drag and drop text */
+
+[data-testid="stFileUploaderDropzone"] {
+    color:white !important;
+}
+
+[data-testid="stFileUploaderDropzone"] span {
+    color:white !important;
+}
+
+/* Chat input */
+
+[data-testid="stChatInput"] textarea {
+    color:white !important;
+}
+
 /* Chat bubbles */
 
 .user-msg {
@@ -71,7 +107,7 @@ body, p, span, div, label {
     border-radius:12px;
     margin:8px;
     text-align:right;
-    color:#000 !important;
+    color:black !important;
     max-width:70%;
     margin-left:auto;
 }
@@ -81,18 +117,17 @@ body, p, span, div, label {
     padding:12px;
     border-radius:12px;
     margin:8px;
-    color:#000 !important;
+    color:black !important;
     max-width:70%;
 }
 
-/* Textarea */
+/* Top navigation icons (>>, share, deploy) */
 
-textarea {
-    border:2px solid black !important;
-    color:#000 !important;
+header, header * {
+    color:white !important;
 }
 
-/* Force consistent appearance in dark mode */
+/* Force dark mode compatibility */
 
 @media (prefers-color-scheme: dark) {
 
@@ -102,11 +137,6 @@ textarea {
 
 body, p, span, div, label {
     color:#1a1a1a !important;
-}
-
-.stButton>button {
-    background-color:#3aafa9 !important;
-    color:white !important;
 }
 
 }
