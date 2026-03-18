@@ -40,23 +40,28 @@ st.markdown("""
 .chat-container {
     padding:15px;
     background:white;
-    border-radius:10px;
+    border-radius:12px;
     margin-top:10px;
 }
 
 .user-msg {
-    background:#dcf8c6;
-    padding:10px;
-    border-radius:10px;
-    margin:6px;
+    background:#DCF8C6;
+    padding:12px;
+    border-radius:12px;
+    margin:8px;
     text-align:right;
+    color:#000;
+    max-width:70%;
+    margin-left:auto;
 }
 
 .bot-msg {
-    background:#f1f0f0;
-    padding:10px;
-    border-radius:10px;
-    margin:6px;
+    background:#F1F0F0;
+    padding:12px;
+    border-radius:12px;
+    margin:8px;
+    color:#000;
+    max-width:70%;
 }
 
 textarea {
