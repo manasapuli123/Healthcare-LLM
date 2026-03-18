@@ -283,15 +283,59 @@ if st.session_state.edit_index is not None:
         value=st.session_state.messages[st.session_state.edit_index]["content"]
     )
 
-    if st.button("Resubmit Question"):
+   if st.button("Resubmit Question"):
 
-        st.session_state.messages[st.session_state.edit_index]["content"] = edit_text
+    edited_question = edit_text
 
-        if len(st.session_state.messages) > st.session_state.edit_index + 1:
-            st.session_state.messages.pop(st.session_state.edit_index + 1)
+    st.session_state.messages[st.session_state.edit_index]["content"] = edited_question
 
-        st.session_state.edit_index = None
-        st.rerun()
+    # remove old assistant response
+    if len(st.session_state.messages) > st.session_state.edit_index + 1:
+        st.session_state.messages.pop(st.session_state.edit_index + 1)
+
+    # Generate new AI answer
+    with st.spinner("Assistant is typing..."):
+
+        query_embedding = model.encode([edited_question])
+
+        distances, indices = index.search(
+            np.array(query_embedding).astype("float32"), k=2
+        )
+
+        retrieved_chunks = [
+            chunks[i] for i in indices[0]
+        ]
+
+        knowledge_context = "\n".join(retrieved_chunks)
+
+        prompt = f"""
+        You are a clinical AI assistant.
+
+Patient Notes:
+{st.session_state.clinical_notes}
+
+Medical Knowledge:
+{knowledge_context}
+
+Question:
+{edited_question}
+
+Provide a helpful medical answer.
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role":"user","content":prompt}]
+        )
+
+        reply = response.choices[0].message.content
+
+    st.session_state.messages.append(
+        {"role":"assistant","content":reply}
+    )
+
+    st.session_state.edit_index = None
+    st.rerun()
 
 # ---------------------------
 # CHAT INPUT
