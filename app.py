@@ -37,11 +37,6 @@ st.markdown("""
     font-weight:bold;
 }
 
-.chat-container {
-    padding:10px;
-    margin-top:10px;
-}
-
 .user-msg {
     background:#DCF8C6;
     padding:12px;
@@ -247,30 +242,28 @@ if "edit_index" not in st.session_state:
 # DISPLAY CHAT
 # ---------------------------
 
-if len(st.session_state.messages) > 0:
+for i, msg in enumerate(st.session_state.messages):
 
-    for i, msg in enumerate(st.session_state.messages):
+    if msg["role"] == "user":
 
-        if msg["role"] == "user":
+        col1, col2 = st.columns([8,1])
 
-            col1, col2 = st.columns([8,1])
-
-            with col1:
-                st.markdown(
-                    f'<div class="user-msg">🧑 {msg["content"]}</div>',
-                    unsafe_allow_html=True
-                )
-
-            with col2:
-                if st.button("✏️", key=f"edit_{i}"):
-                    st.session_state.edit_index = i
-
-        else:
-
+        with col1:
             st.markdown(
-                f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
+                f'<div class="user-msg">🧑 {msg["content"]}</div>',
                 unsafe_allow_html=True
             )
+
+        with col2:
+            if st.button("✏️", key=f"edit_{i}"):
+                st.session_state.edit_index = i
+
+    else:
+
+        st.markdown(
+            f'<div class="bot-msg">👩‍⚕️ {msg["content"]}</div>',
+            unsafe_allow_html=True
+        )
 
 # ---------------------------
 # EDIT QUESTION
@@ -283,33 +276,31 @@ if st.session_state.edit_index is not None:
         value=st.session_state.messages[st.session_state.edit_index]["content"]
     )
 
-   if st.button("Resubmit Question"):
+    if st.button("Resubmit Question"):
 
-    edited_question = edit_text
+        edited_question = edit_text
 
-    st.session_state.messages[st.session_state.edit_index]["content"] = edited_question
+        st.session_state.messages[st.session_state.edit_index]["content"] = edited_question
 
-    # remove old assistant response
-    if len(st.session_state.messages) > st.session_state.edit_index + 1:
-        st.session_state.messages.pop(st.session_state.edit_index + 1)
+        if len(st.session_state.messages) > st.session_state.edit_index + 1:
+            st.session_state.messages.pop(st.session_state.edit_index + 1)
 
-    # Generate new AI answer
-    with st.spinner("Assistant is typing..."):
+        with st.spinner("Assistant is typing..."):
 
-        query_embedding = model.encode([edited_question])
+            query_embedding = model.encode([edited_question])
 
-        distances, indices = index.search(
-            np.array(query_embedding).astype("float32"), k=2
-        )
+            distances, indices = index.search(
+                np.array(query_embedding).astype("float32"), k=2
+            )
 
-        retrieved_chunks = [
-            chunks[i] for i in indices[0]
-        ]
+            retrieved_chunks = [
+                chunks[i] for i in indices[0]
+            ]
 
-        knowledge_context = "\n".join(retrieved_chunks)
+            knowledge_context = "\n".join(retrieved_chunks)
 
-        prompt = f"""
-        You are a clinical AI assistant.
+            prompt = f"""
+You are a clinical AI assistant.
 
 Patient Notes:
 {st.session_state.clinical_notes}
@@ -323,19 +314,19 @@ Question:
 Provide a helpful medical answer.
 """
 
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[{"role":"user","content":prompt}]
+            response = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[{"role":"user","content":prompt}]
+            )
+
+            reply = response.choices[0].message.content
+
+        st.session_state.messages.append(
+            {"role":"assistant","content":reply}
         )
 
-        reply = response.choices[0].message.content
-
-    st.session_state.messages.append(
-        {"role":"assistant","content":reply}
-    )
-
-    st.session_state.edit_index = None
-    st.rerun()
+        st.session_state.edit_index = None
+        st.rerun()
 
 # ---------------------------
 # CHAT INPUT
