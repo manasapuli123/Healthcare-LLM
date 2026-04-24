@@ -42,6 +42,17 @@ st.markdown("""
 st.markdown('<div class="title">🏥 Prior Authorization AI Agent</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">AI-powered workflow decision support for healthcare authorization</div>', unsafe_allow_html=True)
 
+st.markdown("### Try a Sample Scenario")
+
+sample = st.selectbox(
+    "",
+    ["None", "Missing Info", "Complete Case", "Invalid Case"]
+)
+
+st.markdown("---")
+
+col1, col2 = st.columns(2)
+
 # -----------------------
 # SIDEBAR (STARTUP FEEL)
 # -----------------------
