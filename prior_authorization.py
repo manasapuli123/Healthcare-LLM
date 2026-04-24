@@ -1,22 +1,34 @@
 import streamlit as st
 
+# -----------------------
+# PAGE CONFIG
+# -----------------------
 st.set_page_config(
     page_title="Prior Authorization AI Agent",
     layout="wide",
 )
 
 # -----------------------
-# Custom Styling (STARTUP LOOK)
+# REMOVE STREAMLIT DEFAULT UI + FIX EMPTY BARS
 # -----------------------
 st.markdown("""
     <style>
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* App background */
     .main {
         background-color: #f8fafc;
     }
+
+    /* Padding */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
+
+    /* Card styling */
     .card {
         background-color: white;
         padding: 20px;
@@ -24,14 +36,23 @@ st.markdown("""
         box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
         margin-bottom: 20px;
     }
+
+    /* Title */
     .title {
         font-size: 28px;
         font-weight: 700;
         color: #111827;
     }
+
+    /* Subtitle */
     .subtitle {
         color: #6b7280;
         margin-bottom: 20px;
+    }
+
+    /* 🔥 FIX: Hide empty column containers (removes those bars) */
+    div[data-testid="column"] > div:empty {
+        display: none;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -42,29 +63,18 @@ st.markdown("""
 st.markdown('<div class="title">🏥 Prior Authorization AI Agent</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">AI-powered workflow decision support for healthcare authorization</div>', unsafe_allow_html=True)
 
-st.markdown("### Try a Sample Scenario")
+# -----------------------
+# SAMPLE SELECTOR (TOP)
+# -----------------------
+st.markdown("### 🎯 Try a Sample Scenario")
 
 sample = st.selectbox(
     "",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"]
+    ["None", "Missing Info", "Complete Case", "Invalid Case"],
+    label_visibility="collapsed"
 )
 
 st.markdown("---")
-
-col1, col2 = st.columns(2)
-
-# -----------------------
-# SIDEBAR (STARTUP FEEL)
-# -----------------------
-st.sidebar.title("⚙️ Demo Controls")
-
-sample = st.sidebar.selectbox(
-    "Load Sample Scenario",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"]
-)
-
-st.sidebar.markdown("---")
-st.sidebar.info("💡 Tip: Use sample scenarios to quickly test the system.")
 
 # -----------------------
 # SAMPLE DATA
@@ -98,9 +108,9 @@ else:
     documents_default = ""
 
 # -----------------------
-# LAYOUT (2 COLUMNS)
+# LAYOUT
 # -----------------------
-col1, col2 = st.columns([1, 1])
+col1, col2 = st.columns(2, gap="large")
 
 # -----------------------
 # INPUT CARD
@@ -121,7 +131,7 @@ with col1:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # -----------------------
-# DECISION LOGIC
+# LOGIC
 # -----------------------
 def evaluate(diagnosis, documents):
     if not diagnosis:
@@ -141,7 +151,6 @@ with col2:
     if evaluate_clicked:
         status, reason, confidence = evaluate(diagnosis, documents)
 
-        # Status Badge
         if status == "Approved":
             st.success(f"✅ {status}")
         elif status == "Denied":
