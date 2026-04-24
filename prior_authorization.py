@@ -13,7 +13,9 @@ st.set_page_config(
 # -----------------------
 st.markdown("""
 <style>
-.main {
+
+/* 🌊 Full app background */
+[data-testid="stAppViewContainer"] {
     background-color: #eef6ff;
 }
 
