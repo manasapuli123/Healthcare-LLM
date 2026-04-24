@@ -9,62 +9,45 @@ st.set_page_config(
 )
 
 # -----------------------
-# REMOVE STREAMLIT DEFAULT UI + FIX EMPTY BARS
+# GLOBAL STYLES
 # -----------------------
 st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
+<style>
+#MainMenu {visibility: hidden;}
+header {visibility: hidden;}
+footer {visibility: hidden;}
 
-    /* App background */
-    .main {
-        background-color: #f8fafc;
-    }
+.main {
+    background-color: #f8fafc;
+}
 
-    /* Padding */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
+.block-container {
+    padding-top: 2rem;
+}
 
-    /* Card styling */
-    .card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
-        margin-bottom: 20px;
-    }
+/* Card styling */
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+}
 
-    /* Title */
-    .title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #111827;
-    }
-
-    /* Subtitle */
-    .subtitle {
-        color: #6b7280;
-        margin-bottom: 20px;
-    }
-
-    /* 🔥 FIX: Hide empty column containers (removes those bars) */
-    div[data-testid="column"] > div:empty {
-        display: none;
-    }
-    </style>
+/* Hide EMPTY blocks completely */
+div[data-testid="column"]:has(div:empty) {
+    display: none;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # -----------------------
 # HEADER
 # -----------------------
-st.markdown('<div class="title">🏥 Prior Authorization AI Agent</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">AI-powered workflow decision support for healthcare authorization</div>', unsafe_allow_html=True)
+st.markdown("## 🏥 Prior Authorization AI Agent")
+st.markdown("AI-powered workflow decision support for healthcare authorization")
 
 # -----------------------
-# SAMPLE SELECTOR (TOP)
+# SAMPLE SELECTOR
 # -----------------------
 st.markdown("### 🎯 Try a Sample Scenario")
 
@@ -108,9 +91,9 @@ else:
     documents_default = ""
 
 # -----------------------
-# LAYOUT
+# CREATE COLUMNS (ONLY ONCE)
 # -----------------------
-col1, col2 = st.columns(2, gap="large")
+col1, col2 = st.columns(2)
 
 # -----------------------
 # INPUT CARD
@@ -144,11 +127,11 @@ def evaluate(diagnosis, documents):
 # OUTPUT CARD
 # -----------------------
 with col2:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.subheader("📊 Decision Outcome")
-
     if evaluate_clicked:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+
+        st.subheader("📊 Decision Outcome")
+
         status, reason, confidence = evaluate(diagnosis, documents)
 
         if status == "Approved":
@@ -164,13 +147,4 @@ with col2:
         st.markdown("### Confidence")
         st.write(confidence)
 
-    else:
-        st.info("Run evaluation to see results")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -----------------------
-# FOOTER
-# -----------------------
-st.markdown("---")
-st.caption("⚠️ Prototype for demonstration purposes only. Not for clinical use.")
+        st.markdown('</div>', unsafe_allow_html=True)
