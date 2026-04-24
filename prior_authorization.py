@@ -9,17 +9,10 @@ st.set_page_config(
 )
 
 # -----------------------
-# GLOBAL STYLES
+# STYLES
 # -----------------------
 st.markdown("""
 <style>
-#MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-footer {visibility: hidden;}
-input, textarea {
-    background-color: #f9fafb !important;
-}
-
 .main {
     background-color: #f8fafc;
 }
@@ -28,7 +21,7 @@ input, textarea {
     padding-top: 2rem;
 }
 
-/* Card styling */
+/* Card */
 .card {
     background-color: white;
     padding: 20px;
@@ -36,12 +29,43 @@ input, textarea {
     box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
 }
 
-/* Hide EMPTY blocks completely */
-div[data-testid="column"]:has(div:empty) {
-    display: none;
+/* Inputs */
+input, textarea {
+    background-color: #f9fafb !important;
+}
+
+/* Remove extra spacing */
+section.main > div {
+    gap: 0rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
+# -----------------------
+# SIDEBAR (HAMBURGER MENU)
+# -----------------------
+st.sidebar.title("🏥 Product Overview")
+
+st.sidebar.markdown("""
+**Prior Authorization AI Agent**
+
+This tool simulates real-world healthcare authorization workflows.
+
+### What it does:
+- Evaluates prior authorization requests  
+- Identifies missing documentation  
+- Assigns workflow status  
+- Recommends next steps  
+
+### Why it matters:
+- Reduces manual review effort  
+- Improves approval turnaround time  
+- Enhances decision consistency  
+
+---
+
+💡 Use sample scenarios to explore behavior.
+""")
 
 # -----------------------
 # HEADER
@@ -94,8 +118,10 @@ else:
     documents_default = ""
 
 # -----------------------
-# CREATE COLUMNS (ONLY ONCE)
+# MAIN CONTENT (NO EMPTY BOX ISSUE)
 # -----------------------
+st.markdown("")
+
 col1, col2 = st.columns(2)
 
 # -----------------------
@@ -130,11 +156,11 @@ def evaluate(diagnosis, documents):
 # OUTPUT CARD
 # -----------------------
 with col2:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    st.subheader("📊 Decision Outcome")
+
     if evaluate_clicked:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-
-        st.subheader("📊 Decision Outcome")
-
         status, reason, confidence = evaluate(diagnosis, documents)
 
         if status == "Approved":
@@ -150,4 +176,13 @@ with col2:
         st.markdown("### Confidence")
         st.write(confidence)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.info("Run evaluation to see results")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# -----------------------
+# FOOTER
+# -----------------------
+st.markdown("---")
+st.caption("⚠️ Prototype for demonstration purposes only. Not for clinical use.")
