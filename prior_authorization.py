@@ -9,20 +9,14 @@ st.set_page_config(
 )
 
 # -----------------------
-# GLOBAL STYLES
+# STYLES
 # -----------------------
 st.markdown("""
 <style>
-#MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-footer {visibility: hidden;}
 
+/* App background */
 .main {
     background-color: #f8fafc;
-}
-
-.block-container {
-    padding-top: 2rem;
 }
 
 /* Card styling */
@@ -33,12 +27,44 @@ footer {visibility: hidden;}
     box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
 }
 
-/* Hide EMPTY blocks completely */
-div[data-testid="column"]:has(div:empty) {
-    display: none;
+/* Input styling */
+input, textarea {
+    background-color: #f9fafb !important;
 }
+
+/* 🔥 FIX: Remove white bar in dropdown */
+div[data-baseweb="select"] {
+    background-color: #f9fafb !important;
+    border-radius: 8px;
+}
+
+div[data-baseweb="select"] > div {
+    background-color: #f9fafb !important;
+}
+
+div[data-baseweb="select"] span {
+    background-color: #f9fafb !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
+# -----------------------
+# SIDEBAR
+# -----------------------
+st.sidebar.title("🏥 Product Overview")
+
+st.sidebar.markdown("""
+**Prior Authorization AI Agent**
+
+This tool simulates real-world healthcare authorization workflows.
+
+### What it does:
+- Evaluates prior authorization requests  
+- Identifies missing documentation  
+- Assigns workflow status  
+- Recommends next steps  
+""")
 
 # -----------------------
 # HEADER
@@ -52,9 +78,8 @@ st.markdown("AI-powered workflow decision support for healthcare authorization")
 st.markdown("### 🎯 Try a Sample Scenario")
 
 sample = st.selectbox(
-    "",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"],
-    label_visibility="collapsed"
+    "Scenario",
+    ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
 
 st.markdown("---")
@@ -85,66 +110,4 @@ elif sample == "Invalid Case":
 
 else:
     patient_default = ""
-    procedure_default = ""
-    diagnosis_default = ""
-    insurance_default = ""
-    documents_default = ""
-
-# -----------------------
-# CREATE COLUMNS (ONLY ONCE)
-# -----------------------
-col1, col2 = st.columns(2)
-
-# -----------------------
-# INPUT CARD
-# -----------------------
-with col1:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.subheader("📝 Request Details")
-
-    patient = st.text_input("Patient Name", value=patient_default)
-    procedure = st.text_input("Procedure", value=procedure_default)
-    diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
-    insurance = st.text_input("Insurance", value=insurance_default)
-    documents = st.text_area("Documents Provided", value=documents_default)
-
-    evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -----------------------
-# LOGIC
-# -----------------------
-def evaluate(diagnosis, documents):
-    if not diagnosis:
-        return "Denied", "Missing diagnosis", "High"
-    if "clinical notes" not in documents.lower():
-        return "Pending Information", "Missing clinical notes", "Medium"
-    return "Approved", "All required information present", "High"
-
-# -----------------------
-# OUTPUT CARD
-# -----------------------
-with col2:
-    if evaluate_clicked:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-
-        st.subheader("📊 Decision Outcome")
-
-        status, reason, confidence = evaluate(diagnosis, documents)
-
-        if status == "Approved":
-            st.success(f"✅ {status}")
-        elif status == "Denied":
-            st.error(f"❌ {status}")
-        else:
-            st.warning(f"⚠️ {status}")
-
-        st.markdown("### Explanation")
-        st.write(reason)
-
-        st.markdown("### Confidence")
-        st.write(confidence)
-
-        st.markdown('</div>', unsafe_allow_html=True)
+    procedure
