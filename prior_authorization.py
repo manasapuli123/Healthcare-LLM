@@ -16,6 +16,9 @@ st.markdown("""
 #MainMenu {visibility: hidden;}
 header {visibility: hidden;}
 footer {visibility: hidden;}
+input, textarea {
+    background-color: #f9fafb !important;
+}
 
 .main {
     background-color: #f8fafc;
