@@ -79,11 +79,9 @@ st.markdown("AI-powered workflow decision support for healthcare authorization")
 st.markdown("### 🎯 Try a Sample Scenario")
 
 sample = st.selectbox(
-    "",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"],
-    label_visibility="collapsed"
+    "Scenario",
+    ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
-
 st.markdown("---")
 
 # -----------------------
