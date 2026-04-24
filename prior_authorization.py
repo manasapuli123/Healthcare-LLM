@@ -33,6 +33,11 @@ st.markdown("""
 input, textarea {
     background-color: #f9fafb !important;
 }
+/* 🔥 ADD THIS */
+div[data-baseweb="select"] > div {
+    background-color: #f9fafb !important;
+    border-radius: 8px;
+}
 
 /* Remove extra spacing */
 section.main > div {
