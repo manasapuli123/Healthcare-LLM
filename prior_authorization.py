@@ -88,12 +88,15 @@ st.markdown("AI-powered workflow decision support for healthcare authorization")
 # -----------------------
 # SAMPLE SELECTOR
 # -----------------------
-st.markdown("### 🎯 Try a Sample Scenario")
+st.markdown('<div class="card">', unsafe_allow_html=True)
+
+st.subheader("🎯 Try a Sample Scenario")
 
 sample = st.selectbox(
     "Scenario",
     ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -----------------------
 # SAMPLE DATA
