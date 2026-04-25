@@ -154,10 +154,10 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------
 def evaluate(diagnosis, documents):
     if not diagnosis:
-        return "Denied", "Missing diagnosis", "High"
+        return "Denied", "Missing diagnosis", 40
     if "clinical notes" not in documents.lower():
-        return "Pending Information", "Missing clinical notes", "Medium"
-    return "Approved", "All required information present", "High"
+        return "Pending Information", "Missing clinical notes", 65
+    return "Approved", "All required information present", 90
 
 # -----------------------
 # OUTPUT CARD
@@ -179,8 +179,10 @@ if evaluate_clicked:
     st.markdown("### Explanation")
     st.write(reason)
 
-    st.markdown("### Confidence")
-    st.write(confidence)
+    st.caption("Model confidence based on completeness of provided data")
+    st.markdown("### Confidence Score")
+    st.progress(confidence / 100)
+    st.write(f"{confidence}% confidence")
 
 else:
     st.info("Run evaluation to see results")
