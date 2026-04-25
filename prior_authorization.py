@@ -5,7 +5,7 @@ import streamlit as st
 # -----------------------
 st.set_page_config(
     page_title="Prior Authorization AI Agent",
-    layout="centered",  # centered avoids wide empty artifacts
+    layout="centered",
 )
 
 # -----------------------
@@ -33,7 +33,7 @@ input, textarea {
     background-color: #f9fafb !important;
 }
 
-/* Dropdown fix (removes white strip) */
+/* Dropdown fix */
 div[data-baseweb="select"] {
     background-color: #f9fafb !important;
     border-radius: 8px;
@@ -45,13 +45,46 @@ div[data-baseweb="select"] span {
     background-color: #f9fafb !important;
 }
 
-/* 🔥 FIX: remove empty white block between sections */
+/* 🔥 FIX: remove empty white blocks */
 div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
+# -----------------------
+# SIDEBAR
+# -----------------------
+st.sidebar.title("🏥 Product Overview")
+
+st.sidebar.markdown("""
+**Prior Authorization AI Agent**
+
+Simulates real-world authorization workflows.
+
+**What it does**
+- Evaluates requests  
+- Flags missing documentation  
+- Assigns status  
+- Suggests next steps  
+""")
+
+# -----------------------
+# HEADER
+# -----------------------
+st.markdown("## 🏥 Prior Authorization AI Agent")
+st.markdown("AI-powered workflow decision support for healthcare authorization")
+
+# -----------------------
+# SAMPLE SELECTOR
+# -----------------------
+st.markdown("### 🎯 Try a Sample Scenario")
+
+sample = st.selectbox(
+    "Scenario",
+    ["None", "Missing Info", "Complete Case", "Invalid Case"]
+)
 
 # -----------------------
 # SAMPLE DATA
