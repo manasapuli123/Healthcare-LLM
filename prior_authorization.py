@@ -86,69 +86,68 @@ st.markdown("## 🏥 Prior Authorization AI Agent")
 st.markdown("AI-powered workflow decision support for healthcare authorization")
 
 # -----------------------
-# SAMPLE SELECTOR
+# MAIN UI CONTAINER (FIXES WHITE BOX)
 # -----------------------
-st.markdown("### 🎯 Try a Sample Scenario")
-
-sample = st.selectbox(
-    "Scenario",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"]
-)
-# 🔥 Fix: absorb Streamlit's extra block
 with st.container():
-    st.markdown(
-        "<div style='margin-top:-20px'></div>",
-        unsafe_allow_html=True
+
+    # -------- Scenario card --------
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    st.subheader("🎯 Try a Sample Scenario")
+
+    sample = st.selectbox(
+        "Scenario",
+        ["None", "Missing Info", "Complete Case", "Invalid Case"]
     )
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# -----------------------
+# SAMPLE DATA (must be inside so values update correctly)
+# -----------------------
+    if sample == "Missing Info":
+        patient_default = "John Doe"
+        procedure_default = "MRI"
+        diagnosis_default = "Lower back pain"
+        insurance_default = "Aetna"
+        documents_default = ""
+
+    elif sample == "Complete Case":
+        patient_default = "Sarah Lee"
+        procedure_default = "CT Scan"
+        diagnosis_default = "Head injury"
+        insurance_default = "Cigna"
+        documents_default = "Clinical notes, imaging report"
+
+    elif sample == "Invalid Case":
+        patient_default = "Mike Ross"
+        procedure_default = "Surgery"
+        diagnosis_default = ""
+        insurance_default = "United Healthcare"
+        documents_default = "Clinical notes"
+
+    else:
+        patient_default = ""
+        procedure_default = ""
+        diagnosis_default = ""
+        insurance_default = ""
+        documents_default = ""
+
+# -------- Request details card --------
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    st.subheader("📝 Request Details")
+
+    patient = st.text_input("Patient Name", value=patient_default)
+    procedure = st.text_input("Procedure", value=procedure_default)
+    diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
+    insurance = st.text_input("Insurance", value=insurance_default)
+    documents = st.text_area("Documents Provided", value=documents_default)
+
+    evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
     
-# -----------------------
-# SAMPLE DATA
-# -----------------------
-if sample == "Missing Info":
-    patient_default = "John Doe"
-    procedure_default = "MRI"
-    diagnosis_default = "Lower back pain"
-    insurance_default = "Aetna"
-    documents_default = ""
-
-elif sample == "Complete Case":
-    patient_default = "Sarah Lee"
-    procedure_default = "CT Scan"
-    diagnosis_default = "Head injury"
-    insurance_default = "Cigna"
-    documents_default = "Clinical notes, imaging report"
-
-elif sample == "Invalid Case":
-    patient_default = "Mike Ross"
-    procedure_default = "Surgery"
-    diagnosis_default = ""
-    insurance_default = "United Healthcare"
-    documents_default = "Clinical notes"
-
-else:
-    patient_default = ""
-    procedure_default = ""
-    diagnosis_default = ""
-    insurance_default = ""
-    documents_default = ""
-
-# -----------------------
-# INPUT CARD
-# -----------------------
-st.markdown('<div class="card">', unsafe_allow_html=True)
-
-st.subheader("📝 Request Details")
-
-patient = st.text_input("Patient Name", value=patient_default)
-procedure = st.text_input("Procedure", value=procedure_default)
-diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
-insurance = st.text_input("Insurance", value=insurance_default)
-documents = st.text_area("Documents Provided", value=documents_default)
-
-evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
 # -----------------------
 # LOGIC
 # -----------------------
