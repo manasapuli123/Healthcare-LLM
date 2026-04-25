@@ -19,13 +19,13 @@ st.markdown("""
     background-color: #f8fafc;
 }
 
-/* Card styling */
+/* Card */
 .card {
     background-color: white;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 /* Inputs */
@@ -34,30 +34,26 @@ input, textarea {
 }
 
 /* Dropdown fix */
-div[data-baseweb="select"] {
+div[data-baseweb="select"],
+div[data-baseweb="select"] > div,
+div[data-baseweb="select"] span {
     background-color: #f9fafb !important;
     border-radius: 8px;
 }
-div[data-baseweb="select"] > div {
-    background-color: #f9fafb !important;
-}
-div[data-baseweb="select"] span {
-    background-color: #f9fafb !important;
-}
 
-/* 🔥 Remove empty blocks */
+/* 🔥 CRITICAL FIX */
 div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
 }
 
-/* 🔥 Reduce spacing */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.5rem;
+/* 🔥 REMOVE ALL EMPTY WRAPPERS */
+div:has(> div:empty) {
+    display: none !important;
 }
 
-/* ✅ Optional fix (ADD HERE) */
-.card + div {
-    margin-top: 0 !important;
+/* 🔥 REMOVE EXTRA SPACING BETWEEN BLOCKS */
+section.main > div {
+    gap: 0rem !important;
 }
 
 </style>
