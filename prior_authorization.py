@@ -45,43 +45,13 @@ div[data-baseweb="select"] span {
     background-color: #f9fafb !important;
 }
 
+/* 🔥 FIX: remove empty white block between sections */
+div[data-testid="stVerticalBlock"] > div:empty {
+    display: none !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
-# -----------------------
-# SIDEBAR
-# -----------------------
-st.sidebar.title("🏥 Product Overview")
-
-st.sidebar.markdown("""
-**Prior Authorization AI Agent**
-
-Simulates real-world authorization workflows.
-
-**What it does**
-- Evaluates requests  
-- Flags missing documentation  
-- Assigns status  
-- Suggests next steps  
-""")
-
-# -----------------------
-# HEADER
-# -----------------------
-st.markdown("## 🏥 Prior Authorization AI Agent")
-st.markdown("AI-powered workflow decision support for healthcare authorization")
-
-# -----------------------
-# SAMPLE SELECTOR
-# -----------------------
-st.markdown("### 🎯 Try a Sample Scenario")
-
-sample = st.selectbox(
-    "Scenario",
-    ["None", "Missing Info", "Complete Case", "Invalid Case"]
-)
-
-st.markdown("---")
 
 # -----------------------
 # SAMPLE DATA
