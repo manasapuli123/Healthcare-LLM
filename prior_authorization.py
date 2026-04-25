@@ -94,7 +94,13 @@ sample = st.selectbox(
     "Scenario",
     ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
-
+# 🔥 Fix: absorb Streamlit's extra block
+with st.container():
+    st.markdown(
+        "<div style='margin-top:-20px'></div>",
+        unsafe_allow_html=True
+    )
+    
 # -----------------------
 # SAMPLE DATA
 # -----------------------
