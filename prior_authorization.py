@@ -154,10 +154,27 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------
 def evaluate(diagnosis, documents):
     if not diagnosis:
-        return "Denied", "Missing diagnosis", 40
+        return (
+            "Denied",
+            "The request cannot be processed due to a missing diagnosis. "
+            "Please provide a valid clinical diagnosis to establish medical necessity.",
+            40
+        )
+
     if "clinical notes" not in documents.lower():
-        return "Pending Information", "Missing clinical notes", 65
-    return "Approved", "All required information present", 90
+        return (
+            "Pending Information",
+            "The request is pending because required clinical documentation is missing. "
+            "Please submit physician notes or supporting medical records that justify the procedure.",
+            65
+        )
+
+    return (
+        "Approved",
+        "The request meets the necessary criteria based on the provided diagnosis and supporting documentation. "
+        "All required clinical information is complete.",
+        90
+    )
 
 # -----------------------
 # OUTPUT CARD
