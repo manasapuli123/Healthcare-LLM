@@ -49,7 +49,9 @@ div[data-baseweb="select"] span {
 div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
 }
-
+.card + div {
+    margin-top: 0 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
