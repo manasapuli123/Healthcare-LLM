@@ -24,8 +24,8 @@ st.markdown("""
     background-color: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
 }
 
 /* Inputs */
@@ -45,13 +45,21 @@ div[data-baseweb="select"] span {
     background-color: #f9fafb !important;
 }
 
-/* 🔥 FIX: remove empty white blocks */
+/* 🔥 Remove empty blocks */
 div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
 }
+
+/* 🔥 Reduce spacing */
+div[data-testid="stVerticalBlock"] {
+    gap: 0.5rem;
+}
+
+/* ✅ Optional fix (ADD HERE) */
 .card + div {
     margin-top: 0 !important;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
