@@ -59,6 +59,12 @@ div[data-testid="stVerticalBlock"] {
 .card + div {
     margin-top: 0 !important;
 }
+
+/* 🔥 Move the header up */
+.block-container {
+    padding-top: 0.5rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
