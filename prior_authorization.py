@@ -195,6 +195,15 @@ if evaluate_clicked:
 
     st.markdown("### Explanation")
     st.write(reason)
+    
+    st.markdown("### 📌 Recommended Action")
+
+    if status == "Denied":
+        st.error("Update and resubmit with required diagnosis information.")
+    elif status == "Pending Information":
+        st.warning("Upload missing clinical notes to proceed with review.")
+    else:
+        st.success("No further action required. Request approved.")
 
     st.caption("Model confidence based on completeness of provided data")
     st.markdown("### Confidence Score")
