@@ -23,6 +23,12 @@ st.markdown("""
     background-color: #eef6ff;
 }
 
+/* Top bar */
+[data-testid="stHeader"] {
+    background-color: #eef6ff;
+    box-shadow: none;
+}
+
 /* -----------------------
    HEADER SPACING
 ----------------------- */
