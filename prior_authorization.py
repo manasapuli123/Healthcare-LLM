@@ -177,7 +177,7 @@ def evaluate(diagnosis, documents):
     if not diagnosis:
         issues.append("missing diagnosis")
 
-    if "clinical notes" not in documents.lower():
+    if not documents or len(documents.strip()) < 20:
         issues.append("missing clinical notes")
 
     # Decision logic
