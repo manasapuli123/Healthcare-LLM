@@ -25,7 +25,7 @@ st.markdown("""
    HEADER SPACING
 ----------------------- */
 .block-container {
-    padding-top: 1.5rem !important;
+    padding-top: 2rem !important;
 }
 
 /* -----------------------
