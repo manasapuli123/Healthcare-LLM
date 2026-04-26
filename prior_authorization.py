@@ -98,15 +98,43 @@ div[data-testid="stVerticalBlock"] {
 st.sidebar.title("🏥 Product Overview")
 
 st.sidebar.markdown("""
-**Prior Authorization AI Agent**
+### Prior Authorization AI Agent
 
-Simulates real-world authorization workflows.
+An AI-powered decision support tool that simulates real-world healthcare authorization workflows.
 
-**What it does**
-- Evaluates requests  
-- Flags missing documentation  
-- Assigns status  
-- Suggests next steps  
+---
+
+### 🚀 What this product does
+- Evaluates prior authorization requests  
+- Analyzes clinical inputs and documentation  
+- Generates approval decisions (Approved / Pending / Denied)  
+- Provides clear explanations and recommended actions  
+
+---
+
+### 🧠 Key Capabilities
+- Multi-factor decision logic (diagnosis + documentation)  
+- Confidence scoring for each decision  
+- Clinical reasoning-style explanations  
+- File-based input support (clinical notes upload)  
+
+---
+
+### 📄 Output
+- Structured decision summary  
+- Actionable next steps  
+- Downloadable report for audit/documentation  
+
+---
+
+### 💡 Why this matters
+Prior authorization is a critical bottleneck in healthcare.  
+This tool demonstrates how AI can streamline decision-making, improve transparency, and reduce manual review effort.
+
+---
+
+### ⚠️ Note
+This is a prototype for demonstration purposes only.
 """)
 
 # -----------------------
