@@ -18,7 +18,7 @@ st.markdown("""
    APP BACKGROUND
 ----------------------- */
 .main {
-    background-color: #f8fafc;
+    background-color: #eef6ff;
 }
 
 /* -----------------------
