@@ -186,33 +186,31 @@ else:
 # -----------------------
 # INPUT CARD
 # -----------------------
-st.markdown('<div class="card">', unsafe_allow_html=True)
+with st.container():
 
-st.subheader("📝 Request Details")
+    st.subheader("📝 Request Details")
 
-patient = st.text_input("Patient Name", value=patient_default)
-procedure = st.text_input("Procedure", value=procedure_default)
-diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
-insurance = st.text_input("Insurance", value=insurance_default)
-# 📎 Upload clinical notes
-uploaded_file = st.file_uploader(
-    "Upload Clinical Notes (TXT)",
-    type=["txt"]
-)
+    patient = st.text_input("Patient Name", value=patient_default)
+    procedure = st.text_input("Procedure", value=procedure_default)
+    diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
+    insurance = st.text_input("Insurance", value=insurance_default)
 
-# Handle uploaded file OR fallback to text input
-if uploaded_file is not None:
-    documents = uploaded_file.read().decode("utf-8")
-    st.success(f"Uploaded file: {uploaded_file.name}")
-else:
-    documents = st.text_area(
-        "Or paste clinical notes here",
-        value=documents_default
+    uploaded_file = st.file_uploader(
+        "Upload Clinical Notes (TXT)",
+        type=["txt"]
     )
-evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+    if uploaded_file is not None:
+        documents = uploaded_file.read().decode("utf-8")
+        st.success(f"Uploaded file: {uploaded_file.name}")
+    else:
+        documents = st.text_area(
+            "Or paste clinical notes here",
+            value=documents_default
+        )
 
+    evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
+    
 # -----------------------
 # LOGIC
 # -----------------------
