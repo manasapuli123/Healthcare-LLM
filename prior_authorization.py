@@ -62,7 +62,7 @@ div[data-testid="stVerticalBlock"] {
 
 /* 🔥 Move the header up */
 .block-container {
-    padding-top: 1rem !important;
+    padding-top: 2rem !important;
 }
 
 </style>
