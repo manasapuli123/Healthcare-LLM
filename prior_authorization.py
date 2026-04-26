@@ -14,12 +14,23 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* App background */
+/* -----------------------
+   APP BACKGROUND
+----------------------- */
 .main {
     background-color: #f8fafc;
 }
 
-/* Card styling */
+/* -----------------------
+   HEADER SPACING
+----------------------- */
+.block-container {
+    padding-top: 1.5rem !important;
+}
+
+/* -----------------------
+   CARD STYLE
+----------------------- */
 .card {
     background-color: white;
     padding: 24px;
@@ -28,51 +39,54 @@ st.markdown("""
     margin-bottom: 16px;
     border: 1px solid #f1f5f9;
 }
-/* Inputs */
+
+/* -----------------------
+   INPUT FIELDS
+----------------------- */
 input, textarea {
     background-color: #f9fafb !important;
 }
 
-/* Dropdown fix */
-div[data-baseweb="select"] {
-    background-color: #f9fafb !important;
-    border-radius: 8px;
-}
+/* -----------------------
+   DROPDOWN (FIXED + COMPACT)
+----------------------- */
+
+/* actual dropdown element (controls height) */
 div[data-baseweb="select"] > div {
     background-color: #f9fafb !important;
+    border-radius: 8px;
+    min-height: 34px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
 }
+
+/* remove white strip inside */
 div[data-baseweb="select"] span {
     background-color: #f9fafb !important;
 }
 
-/* 🔥 Remove empty blocks */
+/* reduce spacing below dropdown */
+div[data-testid="stSelectbox"] {
+    margin-bottom: 4px !important;
+}
+
+/* -----------------------
+   LAYOUT SPACING
+----------------------- */
+
+/* remove empty blocks */
 div[data-testid="stVerticalBlock"] > div:empty {
     display: none !important;
 }
 
-/* 🔥 Reduce spacing */
+/* tighten vertical spacing */
 div[data-testid="stVerticalBlock"] {
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
-/* ✅ Optional fix (ADD HERE) */
+/* remove gap after cards */
 .card + div {
     margin-top: 0 !important;
-}
-
-/* 🔥 Move the header up */
-.block-container {
-    padding-top: 2rem !important;
-}
-
-/* Reduce space after selectbox */
-div[data-testid="stSelectbox"] {
-    margin-bottom: -15px;
-}
-
-/* Reduce vertical gaps globally */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.5rem;
 }
 
 </style>
