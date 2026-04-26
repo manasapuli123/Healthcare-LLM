@@ -65,6 +65,16 @@ div[data-testid="stVerticalBlock"] {
     padding-top: 2rem !important;
 }
 
+/* Reduce space after selectbox */
+div[data-testid="stSelectbox"] {
+    margin-bottom: -15px;
+}
+
+/* Reduce vertical gaps globally */
+div[data-testid="stVerticalBlock"] {
+    gap: 0.5rem;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
