@@ -194,13 +194,10 @@ def evaluate(diagnosis, documents):
 # -----------------------
 # OUTPUT CARD
 # -----------------------
-st.markdown('<div class="card">', unsafe_allow_html=True)
-
-st.subheader("📊 Decision Outcome")
-
 if evaluate_clicked:
     status, reason, confidence = evaluate(diagnosis, documents)
 
+    # Status
     if status == "Approved":
         st.success(f"✅ {status}")
     elif status == "Denied":
@@ -208,11 +205,12 @@ if evaluate_clicked:
     else:
         st.warning(f"⚠️ {status}")
 
-    st.markdown("### Explanation")
+    # Explanation
+    st.markdown("### 🧠 AI Explanation")
     st.write(reason)
-    
-    st.markdown("### 📌 Recommended Action")
 
+    # Recommended action
+    st.markdown("### 📌 Recommended Action")
     if status == "Denied":
         st.error("Update and resubmit with required diagnosis information.")
     elif status == "Pending Information":
@@ -220,16 +218,39 @@ if evaluate_clicked:
     else:
         st.success("No further action required. Request approved.")
 
-    st.caption("Model confidence based on completeness of provided data")
+    # Confidence
     st.markdown("### Confidence Score")
     st.progress(confidence / 100)
     st.write(f"{confidence}% confidence")
 
-else:
-    st.info("Run evaluation to see results")
+    # 🔥 REPORT
+    report = f"""
+Prior Authorization Report
+--------------------------
 
-st.markdown('</div>', unsafe_allow_html=True)
+Patient Name: {patient}
+Procedure: {procedure}
+Diagnosis: {diagnosis}
+Insurance: {insurance}
 
+Decision: {status}
+Confidence: {confidence}%
+
+Explanation:
+{reason}
+
+Recommended Action:
+{"Update and resubmit with required diagnosis information." if status == "Denied" else
+ "Upload missing clinical notes to proceed with review." if status == "Pending Information" else
+ "No further action required. Request approved."}
+"""
+
+    st.download_button(
+        label="📄 Download Report",
+        data=report,
+        file_name="prior_authorization_report.txt",
+        mime="text/plain"
+    )
 # -----------------------
 # FOOTER
 # -----------------------
