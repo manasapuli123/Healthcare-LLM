@@ -153,28 +153,43 @@ st.markdown('</div>', unsafe_allow_html=True)
 # LOGIC
 # -----------------------
 def evaluate(diagnosis, documents):
+    issues = []
+    
     if not diagnosis:
-        return (
-            "Denied",
-            "The request cannot be processed due to a missing diagnosis. "
-            "Please provide a valid clinical diagnosis to establish medical necessity.",
-            40
-        )
+        issues.append("missing diagnosis")
 
     if "clinical notes" not in documents.lower():
-        return (
-            "Pending Information",
-            "The request is pending because required clinical documentation is missing. "
-            "Please submit physician notes or supporting medical records that justify the procedure.",
-            65
-        )
+        issues.append("missing clinical notes")
 
-    return (
-        "Approved",
-        "The request meets the necessary criteria based on the provided diagnosis and supporting documentation. "
-        "All required clinical information is complete.",
-        90
-    )
+    # Decision logic
+    if "missing diagnosis" in issues:
+        status = "Denied"
+        confidence = 40
+    elif issues:
+        status = "Pending Information"
+        confidence = 65
+    else:
+        status = "Approved"
+        confidence = 90
+
+    # Build explanation dynamically
+    if not issues:
+        explanation = (
+            "The request meets medical necessity criteria based on the provided diagnosis "
+            "and supporting clinical documentation. All required information is complete."
+        )
+    else:
+        explanation = "The request requires additional review due to the following issues: "
+
+        if "missing diagnosis" in issues:
+            explanation += "a valid diagnosis is not provided. "
+
+        if "missing clinical notes" in issues:
+            explanation += "supporting clinical documentation is missing. "
+
+        explanation += "Please provide the required information to proceed."
+
+    return status, explanation, confidence
 
 # -----------------------
 # OUTPUT CARD
