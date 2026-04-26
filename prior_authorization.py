@@ -22,12 +22,12 @@ st.markdown("""
 /* Card styling */
 .card {
     background-color: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
-    margin-bottom: 10px;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0px 6px 18px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+    border: 1px solid #f1f5f9;
 }
-
 /* Inputs */
 input, textarea {
     background-color: #f9fafb !important;
