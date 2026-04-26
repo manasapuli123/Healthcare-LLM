@@ -17,7 +17,9 @@ st.markdown("""
 /* -----------------------
    APP BACKGROUND
 ----------------------- */
-.main {
+
+/* 🌊 FULL APP BACKGROUND */
+[data-testid="stAppViewContainer"] {
     background-color: #eef6ff;
 }
 
