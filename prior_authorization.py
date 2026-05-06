@@ -16,6 +16,20 @@ st.markdown(
     .stApp {
         background-color: #E6F2FF;
     }
+      /* Top header bar */
+    header {
+        background-color: #E6F2FF !important;
+    }
+
+    /* Toolbar (icons row) */
+    .stAppHeader {
+        background-color: #E6F2FF !important;
+    }
+
+    /* Optional: remove border/shadow line */
+    header::before {
+        background: none !important;
+    }
 
     /* Text input fields */
     input, textarea {
