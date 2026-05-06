@@ -62,15 +62,6 @@ sample = st.selectbox(
     ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
 
-# 🔥 NEW: SCENARIO CHANGE DETECTION
-if "prev_sample" not in st.session_state:
-    st.session_state["prev_sample"] = sample
-
-if sample != st.session_state["prev_sample"]:
-    if sample in ["None", "Missing Info"]:
-        st.session_state["generated_notes"] = ""
-    st.session_state["prev_sample"] = sample
-
 # -----------------------
 # SAMPLE DATA
 # -----------------------
@@ -103,6 +94,23 @@ else:
     documents_default = ""
 
 # -----------------------
+# 🔥 UPDATED SCENARIO LOGIC (FIXED)
+# -----------------------
+if "prev_sample" not in st.session_state:
+    st.session_state["prev_sample"] = sample
+    st.session_state["generated_notes"] = documents_default
+
+if sample != st.session_state["prev_sample"]:
+
+    if sample in ["None", "Missing Info"]:
+        st.session_state["generated_notes"] = ""
+
+    elif sample in ["Complete Case", "Invalid Case"]:
+        st.session_state["generated_notes"] = documents_default
+
+    st.session_state["prev_sample"] = sample
+
+# -----------------------
 # INPUT
 # -----------------------
 st.subheader("📝 Request Details")
@@ -127,11 +135,13 @@ if uploaded_file is not None:
 else:
     documents = st.text_area(
         "Or paste clinical notes here",
-        value=st.session_state.get("generated_notes", documents_default),
+        value=st.session_state.get("generated_notes", ""),
         placeholder="Example: Patient presents with lower back pain for 2 weeks..."
     )
 
+# -----------------------
 # VALIDATION DISPLAY
+# -----------------------
 validation_status, validation_msg = validate_clinical_notes(documents)
 
 if validation_status == "valid":
@@ -209,7 +219,12 @@ if evaluate_clicked:
                 "confidence": confidence,
                 "human_decision": human_decision,
                 "notes": reviewer_notes
-            }]).to_csv("reviews.csv", mode="a", header=not os.path.exists("reviews.csv"), index=False)
+            }]).to_csv(
+                "reviews.csv",
+                mode="a",
+                header=not os.path.exists("reviews.csv"),
+                index=False
+            )
 
     else:
         st.success("Automated decision completed")
