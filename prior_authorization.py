@@ -11,13 +11,22 @@ st.set_page_config(
 )
 
 # -----------------------
+# SIDEBAR
+# -----------------------
+st.sidebar.title("🏥 Product Overview")
+st.sidebar.markdown("""
+### Prior Authorization AI Agent
+AI-powered decision support tool with human-in-the-loop review.
+""")
+
+# -----------------------
 # HEADER
 # -----------------------
 st.markdown("## 🏥 Prior Authorization AI Agent")
-st.markdown("AI-powered workflow decision support with human-in-the-loop")
+st.markdown("AI-powered workflow decision support with human review")
 
 # -----------------------
-# ROUTING LOGIC
+# ROUTING LOGIC (NEW)
 # -----------------------
 def route_decision(confidence):
     if confidence >= 85:
@@ -28,7 +37,66 @@ def route_decision(confidence):
         return "Auto-Denied"
 
 # -----------------------
-# AI EVALUATION LOGIC
+# SAMPLE SELECTOR
+# -----------------------
+sample = st.selectbox(
+    "Scenario",
+    ["None", "Missing Info", "Complete Case", "Invalid Case"]
+)
+
+# -----------------------
+# SAMPLE DATA
+# -----------------------
+if sample == "Missing Info":
+    patient_default = "John Doe"
+    procedure_default = "MRI"
+    diagnosis_default = "Lower back pain"
+    insurance_default = "Aetna"
+    documents_default = ""
+
+elif sample == "Complete Case":
+    patient_default = "Sarah Lee"
+    procedure_default = "CT Scan"
+    diagnosis_default = "Head injury"
+    insurance_default = "Cigna"
+    documents_default = "Clinical notes, imaging report"
+
+elif sample == "Invalid Case":
+    patient_default = "Mike Ross"
+    procedure_default = "Surgery"
+    diagnosis_default = ""
+    insurance_default = "United Healthcare"
+    documents_default = "Clinical notes"
+
+else:
+    patient_default = ""
+    procedure_default = ""
+    diagnosis_default = ""
+    insurance_default = ""
+    documents_default = ""
+
+# -----------------------
+# INPUT
+# -----------------------
+st.subheader("📝 Request Details")
+
+patient = st.text_input("Patient Name", value=patient_default)
+procedure = st.text_input("Procedure", value=procedure_default)
+diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
+insurance = st.text_input("Insurance", value=insurance_default)
+
+uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
+
+if uploaded_file is not None:
+    documents = uploaded_file.read().decode("utf-8")
+    st.success(f"Uploaded file: {uploaded_file.name}")
+else:
+    documents = st.text_area("Or paste clinical notes here", value=documents_default)
+
+evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
+
+# -----------------------
+# CORE AI LOGIC
 # -----------------------
 def evaluate(diagnosis, documents):
     issues = []
@@ -49,6 +117,7 @@ def evaluate(diagnosis, documents):
         status = "Approved"
         confidence = 90
 
+    # Explainability (IMPROVED)
     explanation = []
     if "missing diagnosis" in issues:
         explanation.append("❌ Missing valid diagnosis")
@@ -63,38 +132,7 @@ def evaluate(diagnosis, documents):
     return status, explanation, confidence
 
 # -----------------------
-# EVIDENCE EXTRACTION
-# -----------------------
-def extract_sentence(documents, keyword):
-    sentences = documents.split(".")
-    for sentence in sentences:
-        if keyword.lower() in sentence.lower():
-            return sentence.strip()
-    return None
-
-def highlight_text(text, keyword):
-    return text.replace(keyword, f"**{keyword}**")
-
-def get_evidence(diagnosis, documents):
-    evidence = {}
-
-    if diagnosis:
-        match = extract_sentence(documents, diagnosis)
-        if match:
-            highlighted = highlight_text(match, diagnosis)
-            evidence["diagnosis"] = f"✅ Found: {highlighted}"
-        else:
-            evidence["diagnosis"] = "⚠️ Diagnosis not clearly supported in notes"
-
-    if not documents or len(documents.strip()) == 0:
-        evidence["documents"] = "❌ No clinical notes provided"
-    else:
-        evidence["documents"] = "✅ Clinical notes provided"
-
-    return evidence
-
-# -----------------------
-# SAVE REVIEW DATA
+# SAVE REVIEW DATA (NEW)
 # -----------------------
 def save_review(data):
     file_path = "reviews.csv"
@@ -106,30 +144,12 @@ def save_review(data):
         df.to_csv(file_path, mode="a", header=False, index=False)
 
 # -----------------------
-# INPUT FORM
-# -----------------------
-st.subheader("📝 Request Details")
-
-patient = st.text_input("Patient Name")
-procedure = st.text_input("Procedure")
-diagnosis = st.text_input("Diagnosis")
-insurance = st.text_input("Insurance")
-
-uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
-
-if uploaded_file is not None:
-    documents = uploaded_file.read().decode("utf-8")
-    st.success(f"Uploaded file: {uploaded_file.name}")
-else:
-    documents = st.text_area("Or paste clinical notes here")
-
-evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
-
-# -----------------------
 # OUTPUT
 # -----------------------
 if evaluate_clicked:
     status, explanation, confidence = evaluate(diagnosis, documents)
+
+    # 🔥 NEW ROUTED DECISION
     final_status = route_decision(confidence)
 
     st.markdown(f"### 🧾 Final Decision: **{final_status}**")
@@ -143,24 +163,16 @@ if evaluate_clicked:
         st.write(item)
 
     # -----------------------
-    # EVIDENCE
-    # -----------------------
-    evidence = get_evidence(diagnosis, documents)
-
-    st.markdown("### 🔍 Supporting Evidence")
-    st.write("**Diagnosis Evidence:**")
-    st.info(evidence.get("diagnosis", "Not available"))
-
-    st.write("**Documentation Check:**")
-    st.info(evidence.get("documents", "Not available"))
-
-    # -----------------------
-    # HUMAN-IN-THE-LOOP
+    # HUMAN-IN-THE-LOOP UI (NEW)
     # -----------------------
     if final_status == "Needs Review":
         st.warning("⚠️ This case requires human review")
 
-        human_decision = st.radio("Reviewer Decision:", ["Approve", "Deny"])
+        human_decision = st.radio(
+            "Reviewer Decision:",
+            ["Approve", "Deny"]
+        )
+
         reviewer_notes = st.text_area("Reviewer Notes")
 
         if st.button("Submit Review"):
@@ -176,14 +188,17 @@ if evaluate_clicked:
 
             save_review(review_data)
 
+    # -----------------------
+    # AUTO DECISIONS
+    # -----------------------
     else:
         if final_status == "Auto-Approved":
-            st.success("✅ Automatically approved")
+            st.success("✅ Automatically approved based on high confidence")
         else:
-            st.error("❌ Automatically denied")
+            st.error("❌ Automatically denied due to insufficient data")
 
     # -----------------------
-    # METRICS
+    # METRICS (NEW)
     # -----------------------
     if os.path.exists("reviews.csv"):
         df = pd.read_csv("reviews.csv")
@@ -209,9 +224,6 @@ Confidence: {confidence}%
 
 Explanation:
 {', '.join(explanation)}
-
-Evidence:
-{evidence}
 """
 
     st.download_button(
