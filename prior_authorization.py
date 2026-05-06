@@ -9,6 +9,16 @@ st.set_page_config(
     page_title="Prior Authorization AI Agent",
     layout="centered",
 )
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #E6F2FF;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # -----------------------
 # SIDEBAR
