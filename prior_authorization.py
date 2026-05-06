@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import os
 
 # -----------------------
 # PAGE CONFIG
@@ -9,157 +11,39 @@ st.set_page_config(
 )
 
 # -----------------------
-# STYLES
-# -----------------------
-st.markdown("""
-<style>
-
-/* -----------------------
-   APP BACKGROUND
------------------------ */
-
-/* 🌊 FULL APP BACKGROUND */
-[data-testid="stAppViewContainer"] {
-    background-color: #eef6ff;
-}
-
-/* Top bar */
-[data-testid="stHeader"] {
-    background-color: #eef6ff;
-    box-shadow: none;
-}
-
-/* -----------------------
-   HEADER SPACING
------------------------ */
-.block-container {
-    padding-top: 2.5rem !important;
-}
-
-/* -----------------------
-   CARD STYLE
------------------------ */
-.card {
-    background-color: white;
-    padding: 24px;
-    border-radius: 14px;
-    box-shadow: 0px 6px 18px rgba(0,0,0,0.06);
-    margin-bottom: 16px;
-    border: 1px solid #f1f5f9;
-}
-
-/* -----------------------
-   INPUT FIELDS
------------------------ */
-input, textarea {
-    background-color: #f9fafb !important;
-}
-
-/* -----------------------
-   DROPDOWN (FIXED + COMPACT)
------------------------ */
-
-/* actual dropdown element (controls height) */
-div[data-baseweb="select"] > div {
-    background-color: #f9fafb !important;
-    border-radius: 8px;
-    min-height: 34px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-}
-
-/* remove white strip inside */
-div[data-baseweb="select"] span {
-    background-color: #f9fafb !important;
-}
-
-/* reduce spacing below dropdown */
-div[data-testid="stSelectbox"] {
-    margin-bottom: 4px !important;
-}
-
-/* -----------------------
-   LAYOUT SPACING
------------------------ */
-
-/* remove empty blocks */
-div[data-testid="stVerticalBlock"] > div:empty {
-    display: none !important;
-}
-
-/* tighten vertical spacing */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.3rem;
-}
-
-/* remove gap after cards */
-.card + div {
-    margin-top: 0 !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# -----------------------
 # SIDEBAR
 # -----------------------
 st.sidebar.title("🏥 Product Overview")
-
 st.sidebar.markdown("""
 ### Prior Authorization AI Agent
-
-An AI-powered decision support tool that simulates real-world healthcare authorization workflows.
-
----
-
-### 🚀 What this product does
-- Evaluates prior authorization requests  
-- Analyzes clinical inputs and documentation  
-- Generates approval decisions (Approved / Pending / Denied)  
-- Provides clear explanations and recommended actions  
-
----
-
-### 🧠 Key Capabilities
-- Multi-factor decision logic (diagnosis + documentation)  
-- Confidence scoring for each decision  
-- Clinical reasoning-style explanations  
-- File-based input support (clinical notes upload)  
-
----
-
-### 📄 Output
-- Structured decision summary  
-- Actionable next steps  
-- Downloadable report for audit/documentation  
-
----
-
-### 💡 Why this matters
-Prior authorization is a critical bottleneck in healthcare.  
-This tool demonstrates how AI can streamline decision-making, improve transparency, and reduce manual review effort.
-
----
-
-### ⚠️ Note
-This is a prototype for demonstration purposes only.
+AI-powered decision support tool with human-in-the-loop review.
 """)
 
 # -----------------------
 # HEADER
 # -----------------------
 st.markdown("## 🏥 Prior Authorization AI Agent")
-st.markdown("AI-powered workflow decision support for healthcare authorization")
+st.markdown("AI-powered workflow decision support with human review")
+
+# -----------------------
+# ROUTING LOGIC (NEW)
+# -----------------------
+def route_decision(confidence):
+    if confidence >= 85:
+        return "Auto-Approved"
+    elif confidence >= 60:
+        return "Needs Review"
+    else:
+        return "Auto-Denied"
 
 # -----------------------
 # SAMPLE SELECTOR
 # -----------------------
-st.markdown("### 🎯 Try a Sample Scenario")
-
 sample = st.selectbox(
     "Scenario",
     ["None", "Missing Info", "Complete Case", "Invalid Case"]
-)   
+)
+
 # -----------------------
 # SAMPLE DATA
 # -----------------------
@@ -192,46 +76,37 @@ else:
     documents_default = ""
 
 # -----------------------
-# INPUT CARD
+# INPUT
 # -----------------------
-with st.container():
+st.subheader("📝 Request Details")
 
-    st.subheader("📝 Request Details")
+patient = st.text_input("Patient Name", value=patient_default)
+procedure = st.text_input("Procedure", value=procedure_default)
+diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
+insurance = st.text_input("Insurance", value=insurance_default)
 
-    patient = st.text_input("Patient Name", value=patient_default)
-    procedure = st.text_input("Procedure", value=procedure_default)
-    diagnosis = st.text_input("Diagnosis", value=diagnosis_default)
-    insurance = st.text_input("Insurance", value=insurance_default)
+uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
 
-    uploaded_file = st.file_uploader(
-        "Upload Clinical Notes (TXT)",
-        type=["txt"]
-    )
+if uploaded_file is not None:
+    documents = uploaded_file.read().decode("utf-8")
+    st.success(f"Uploaded file: {uploaded_file.name}")
+else:
+    documents = st.text_area("Or paste clinical notes here", value=documents_default)
 
-    if uploaded_file is not None:
-        documents = uploaded_file.read().decode("utf-8")
-        st.success(f"Uploaded file: {uploaded_file.name}")
-    else:
-        documents = st.text_area(
-            "Or paste clinical notes here",
-            value=documents_default
-        )
+evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
 
-    evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
-    
 # -----------------------
-# LOGIC
+# CORE AI LOGIC
 # -----------------------
 def evaluate(diagnosis, documents):
     issues = []
-    
+
     if not diagnosis:
         issues.append("missing diagnosis")
 
     if not documents or len(documents.strip()) < 1:
         issues.append("missing clinical notes")
 
-    # Decision logic
     if "missing diagnosis" in issues:
         status = "Denied"
         confidence = 40
@@ -242,77 +117,113 @@ def evaluate(diagnosis, documents):
         status = "Approved"
         confidence = 90
 
-    # Build explanation dynamically
-    if not issues:
-        explanation = (
-            "The request meets medical necessity criteria based on the provided diagnosis "
-            "and supporting clinical documentation. All required information is complete."
-        )
+    # Explainability (IMPROVED)
+    explanation = []
+    if "missing diagnosis" in issues:
+        explanation.append("❌ Missing valid diagnosis")
     else:
-        explanation = "The request requires additional review due to the following issues: "
+        explanation.append("✅ Diagnosis provided")
 
-        if "missing diagnosis" in issues:
-            explanation += "a valid diagnosis is not provided. "
-
-        if "missing clinical notes" in issues:
-            explanation += "supporting clinical documentation is missing. "
-
-        explanation += "Please provide the required information to proceed."
+    if "missing clinical notes" in issues:
+        explanation.append("❌ Missing clinical documentation")
+    else:
+        explanation.append("✅ Supporting documentation present")
 
     return status, explanation, confidence
 
 # -----------------------
-# OUTPUT CARD
+# SAVE REVIEW DATA (NEW)
+# -----------------------
+def save_review(data):
+    file_path = "reviews.csv"
+    df = pd.DataFrame([data])
+
+    if not os.path.exists(file_path):
+        df.to_csv(file_path, index=False)
+    else:
+        df.to_csv(file_path, mode="a", header=False, index=False)
+
+# -----------------------
+# OUTPUT
 # -----------------------
 if evaluate_clicked:
-    status, reason, confidence = evaluate(diagnosis, documents)
+    status, explanation, confidence = evaluate(diagnosis, documents)
 
-    # Status
-    if status == "Approved":
-        st.success(f"✅ {status}")
-    elif status == "Denied":
-        st.error(f"❌ {status}")
+    # 🔥 NEW ROUTED DECISION
+    final_status = route_decision(confidence)
+
+    st.markdown(f"### 🧾 Final Decision: **{final_status}**")
+    st.write(f"Confidence Score: {confidence}%")
+
+    # -----------------------
+    # EXPLANATION
+    # -----------------------
+    st.markdown("### 🧠 AI Reasoning")
+    for item in explanation:
+        st.write(item)
+
+    # -----------------------
+    # HUMAN-IN-THE-LOOP UI (NEW)
+    # -----------------------
+    if final_status == "Needs Review":
+        st.warning("⚠️ This case requires human review")
+
+        human_decision = st.radio(
+            "Reviewer Decision:",
+            ["Approve", "Deny"]
+        )
+
+        reviewer_notes = st.text_area("Reviewer Notes")
+
+        if st.button("Submit Review"):
+            st.success(f"Final Decision: {human_decision}")
+
+            review_data = {
+                "patient": patient,
+                "ai_decision": final_status,
+                "confidence": confidence,
+                "human_decision": human_decision,
+                "notes": reviewer_notes
+            }
+
+            save_review(review_data)
+
+    # -----------------------
+    # AUTO DECISIONS
+    # -----------------------
     else:
-        st.warning(f"⚠️ {status}")
+        if final_status == "Auto-Approved":
+            st.success("✅ Automatically approved based on high confidence")
+        else:
+            st.error("❌ Automatically denied due to insufficient data")
 
-    # Explanation
-    st.markdown("### 🧠 AI Explanation")
-    st.write(reason)
+    # -----------------------
+    # METRICS (NEW)
+    # -----------------------
+    if os.path.exists("reviews.csv"):
+        df = pd.read_csv("reviews.csv")
 
-    # Recommended action
-    st.markdown("### 📌 Recommended Action")
-    if status == "Denied":
-        st.error("Update and resubmit with required diagnosis information.")
-    elif status == "Pending Information":
-        st.warning("Upload missing clinical notes to proceed with review.")
-    else:
-        st.success("No further action required. Request approved.")
+        st.markdown("### 📊 Review Metrics")
+        st.write("Total Reviews:", len(df))
 
-    # Confidence
-    st.markdown("### Confidence Score")
-    st.progress(confidence / 100)
-    st.write(f"{confidence}% confidence")
+        if "human_decision" in df.columns:
+            override_rate = (df["ai_decision"] != df["human_decision"]).mean()
+            st.write(f"Override Rate: {round(override_rate * 100, 2)}%")
 
-    # 🔥 REPORT
+    # -----------------------
+    # REPORT
+    # -----------------------
     report = f"""
-Prior Authorization Report
---------------------------
-
 Patient Name: {patient}
 Procedure: {procedure}
 Diagnosis: {diagnosis}
 Insurance: {insurance}
 
-Decision: {status}
+AI Decision: {final_status}
 Confidence: {confidence}%
 
 Explanation:
-{reason}
-
-Recommended Action:
-{"Update and resubmit with required diagnosis information." if status == "Denied" else
- "Upload missing clinical notes to proceed with review." if status == "Pending Information" else
- "No further action required. Request approved."}
+{', '.join(explanation)}
 """
 
     st.download_button(
@@ -321,6 +232,7 @@ Recommended Action:
         file_name="prior_authorization_report.txt",
         mime="text/plain"
     )
+
 # -----------------------
 # FOOTER
 # -----------------------
