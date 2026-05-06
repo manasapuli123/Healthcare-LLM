@@ -37,7 +37,7 @@ def route_decision(confidence):
         return "Auto-Denied"
 
 # -----------------------
-# 🔥 CLINICAL NOTE VALIDATION (NEW)
+# CLINICAL NOTE VALIDATION
 # -----------------------
 def validate_clinical_notes(documents):
     if not documents or len(documents.strip()) < 20:
@@ -61,6 +61,15 @@ sample = st.selectbox(
     "Scenario",
     ["None", "Missing Info", "Complete Case", "Invalid Case"]
 )
+
+# 🔥 NEW: SCENARIO CHANGE DETECTION
+if "prev_sample" not in st.session_state:
+    st.session_state["prev_sample"] = sample
+
+if sample != st.session_state["prev_sample"]:
+    if sample in ["None", "Missing Info"]:
+        st.session_state["generated_notes"] = ""
+    st.session_state["prev_sample"] = sample
 
 # -----------------------
 # SAMPLE DATA
@@ -105,7 +114,7 @@ insurance = st.text_input("Insurance", value=insurance_default)
 
 uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
 
-# 🔥 SAMPLE GENERATOR
+# SAMPLE GENERATOR
 if st.button("✨ Generate Sample Clinical Notes"):
     st.session_state["generated_notes"] = (
         "Patient presents with lower back pain for 2 weeks. "
@@ -122,7 +131,7 @@ else:
         placeholder="Example: Patient presents with lower back pain for 2 weeks..."
     )
 
-# 🔥 VALIDATION DISPLAY
+# VALIDATION DISPLAY
 validation_status, validation_msg = validate_clinical_notes(documents)
 
 if validation_status == "valid":
@@ -172,47 +181,6 @@ def evaluate(diagnosis, documents):
     return status, explanation, confidence
 
 # -----------------------
-# EVIDENCE FUNCTIONS
-# -----------------------
-def extract_sentence(documents, keyword):
-    sentences = documents.split(".")
-    for sentence in sentences:
-        if keyword and keyword.lower() in sentence.lower():
-            return sentence.strip()
-    return None
-
-def highlight_text(text, keyword):
-    if keyword:
-        return text.replace(keyword, f"**{keyword}**")
-    return text
-
-def get_evidence(diagnosis, documents):
-    evidence = {}
-
-    if diagnosis:
-        match = extract_sentence(documents, diagnosis)
-        if match:
-            evidence["diagnosis"] = highlight_text(match, diagnosis)
-        else:
-            evidence["diagnosis"] = "Diagnosis not clearly supported"
-
-    evidence["documents"] = "Clinical notes present" if documents else "No notes"
-
-    return evidence
-
-# -----------------------
-# SAVE REVIEW DATA
-# -----------------------
-def save_review(data):
-    file_path = "reviews.csv"
-    df = pd.DataFrame([data])
-
-    if not os.path.exists(file_path):
-        df.to_csv(file_path, index=False)
-    else:
-        df.to_csv(file_path, mode="a", header=False, index=False)
-
-# -----------------------
 # OUTPUT
 # -----------------------
 if evaluate_clicked:
@@ -226,15 +194,6 @@ if evaluate_clicked:
     for item in explanation:
         st.write(item)
 
-    # 🔥 EVIDENCE
-    evidence = get_evidence(diagnosis, documents)
-
-    st.markdown("### 🔍 Supporting Evidence")
-    st.info(evidence.get("diagnosis", "Not available"))
-
-    # -----------------------
-    # HUMAN-IN-THE-LOOP
-    # -----------------------
     if final_status == "Needs Review":
         st.warning("⚠️ Requires human review")
 
@@ -244,29 +203,16 @@ if evaluate_clicked:
         if st.button("Submit Review"):
             st.success(f"Final Decision: {human_decision}")
 
-            save_review({
+            pd.DataFrame([{
                 "patient": patient,
                 "ai_decision": final_status,
                 "confidence": confidence,
                 "human_decision": human_decision,
                 "notes": reviewer_notes
-            })
+            }]).to_csv("reviews.csv", mode="a", header=not os.path.exists("reviews.csv"), index=False)
 
     else:
         st.success("Automated decision completed")
-
-    # -----------------------
-    # METRICS
-    # -----------------------
-    if os.path.exists("reviews.csv"):
-        df = pd.read_csv("reviews.csv")
-
-        st.markdown("### 📊 Review Metrics")
-        st.write("Total Reviews:", len(df))
-
-        if "human_decision" in df.columns:
-            override_rate = (df["ai_decision"] != df["human_decision"]).mean()
-            st.write(f"Override Rate: {round(override_rate * 100, 2)}%")
 
 # -----------------------
 # FOOTER
