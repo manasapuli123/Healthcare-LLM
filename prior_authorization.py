@@ -26,7 +26,7 @@ st.markdown("## 🏥 Prior Authorization AI Agent")
 st.markdown("AI-powered workflow decision support with human review")
 
 # -----------------------
-# ROUTING LOGIC (NEW)
+# ROUTING LOGIC
 # -----------------------
 def route_decision(confidence):
     if confidence >= 85:
@@ -59,14 +59,14 @@ elif sample == "Complete Case":
     procedure_default = "CT Scan"
     diagnosis_default = "Head injury"
     insurance_default = "Cigna"
-    documents_default = "Clinical notes, imaging report"
+    documents_default = "Patient presents with head injury. Imaging recommended."
 
 elif sample == "Invalid Case":
     patient_default = "Mike Ross"
     procedure_default = "Surgery"
     diagnosis_default = ""
     insurance_default = "United Healthcare"
-    documents_default = "Clinical notes"
+    documents_default = "Clinical notes available"
 
 else:
     patient_default = ""
@@ -117,7 +117,6 @@ def evaluate(diagnosis, documents):
         status = "Approved"
         confidence = 90
 
-    # Explainability (IMPROVED)
     explanation = []
     if "missing diagnosis" in issues:
         explanation.append("❌ Missing valid diagnosis")
@@ -132,7 +131,40 @@ def evaluate(diagnosis, documents):
     return status, explanation, confidence
 
 # -----------------------
-# SAVE REVIEW DATA (NEW)
+# 🔍 EVIDENCE FUNCTIONS (NEW)
+# -----------------------
+def extract_sentence(documents, keyword):
+    sentences = documents.split(".")
+    for sentence in sentences:
+        if keyword and keyword.lower() in sentence.lower():
+            return sentence.strip()
+    return None
+
+def highlight_text(text, keyword):
+    if keyword:
+        return text.replace(keyword, f"**{keyword}**")
+    return text
+
+def get_evidence(diagnosis, documents):
+    evidence = {}
+
+    if diagnosis:
+        match = extract_sentence(documents, diagnosis)
+        if match:
+            highlighted = highlight_text(match, diagnosis)
+            evidence["diagnosis"] = f"✅ Found: {highlighted}"
+        else:
+            evidence["diagnosis"] = "⚠️ Diagnosis not clearly supported in notes"
+
+    if not documents or len(documents.strip()) == 0:
+        evidence["documents"] = "❌ No clinical notes provided"
+    else:
+        evidence["documents"] = "✅ Clinical notes provided"
+
+    return evidence
+
+# -----------------------
+# SAVE REVIEW DATA
 # -----------------------
 def save_review(data):
     file_path = "reviews.csv"
@@ -148,31 +180,38 @@ def save_review(data):
 # -----------------------
 if evaluate_clicked:
     status, explanation, confidence = evaluate(diagnosis, documents)
-
-    # 🔥 NEW ROUTED DECISION
     final_status = route_decision(confidence)
 
     st.markdown(f"### 🧾 Final Decision: **{final_status}**")
     st.write(f"Confidence Score: {confidence}%")
 
     # -----------------------
-    # EXPLANATION
+    # AI REASONING
     # -----------------------
     st.markdown("### 🧠 AI Reasoning")
     for item in explanation:
         st.write(item)
 
     # -----------------------
-    # HUMAN-IN-THE-LOOP UI (NEW)
+    # 🔍 EVIDENCE DISPLAY (NEW)
+    # -----------------------
+    evidence = get_evidence(diagnosis, documents)
+
+    st.markdown("### 🔍 Supporting Evidence")
+
+    st.write("**Diagnosis Evidence:**")
+    st.info(evidence.get("diagnosis", "Not available"))
+
+    st.write("**Documentation Check:**")
+    st.info(evidence.get("documents", "Not available"))
+
+    # -----------------------
+    # HUMAN-IN-THE-LOOP
     # -----------------------
     if final_status == "Needs Review":
         st.warning("⚠️ This case requires human review")
 
-        human_decision = st.radio(
-            "Reviewer Decision:",
-            ["Approve", "Deny"]
-        )
-
+        human_decision = st.radio("Reviewer Decision:", ["Approve", "Deny"])
         reviewer_notes = st.text_area("Reviewer Notes")
 
         if st.button("Submit Review"):
@@ -188,9 +227,6 @@ if evaluate_clicked:
 
             save_review(review_data)
 
-    # -----------------------
-    # AUTO DECISIONS
-    # -----------------------
     else:
         if final_status == "Auto-Approved":
             st.success("✅ Automatically approved based on high confidence")
@@ -198,7 +234,7 @@ if evaluate_clicked:
             st.error("❌ Automatically denied due to insufficient data")
 
     # -----------------------
-    # METRICS (NEW)
+    # METRICS
     # -----------------------
     if os.path.exists("reviews.csv"):
         df = pd.read_csv("reviews.csv")
@@ -224,6 +260,9 @@ Confidence: {confidence}%
 
 Explanation:
 {', '.join(explanation)}
+
+Evidence:
+{evidence}
 """
 
     st.download_button(
