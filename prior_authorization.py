@@ -37,6 +37,24 @@ def route_decision(confidence):
         return "Auto-Denied"
 
 # -----------------------
+# 🔥 CLINICAL NOTE VALIDATION (NEW)
+# -----------------------
+def validate_clinical_notes(documents):
+    if not documents or len(documents.strip()) < 20:
+        return "invalid", "Clinical notes are too short"
+
+    keywords = ["pain", "injury", "history", "symptoms", "diagnosis", "report"]
+
+    score = sum(1 for word in keywords if word in documents.lower())
+
+    if score >= 2:
+        return "valid", "Clinical notes look sufficient"
+    elif score == 1:
+        return "weak", "Limited clinical detail detected"
+    else:
+        return "invalid", "Notes lack clinical context"
+
+# -----------------------
 # SAMPLE SELECTOR
 # -----------------------
 sample = st.selectbox(
@@ -59,14 +77,14 @@ elif sample == "Complete Case":
     procedure_default = "CT Scan"
     diagnosis_default = "Head injury"
     insurance_default = "Cigna"
-    documents_default = "Patient presents with head injury. Imaging recommended."
+    documents_default = "Patient presents with head injury. Symptoms include dizziness and pain."
 
 elif sample == "Invalid Case":
     patient_default = "Mike Ross"
     procedure_default = "Surgery"
     diagnosis_default = ""
     insurance_default = "United Healthcare"
-    documents_default = "Clinical notes available"
+    documents_default = "Hello test text"
 
 else:
     patient_default = ""
@@ -87,11 +105,32 @@ insurance = st.text_input("Insurance", value=insurance_default)
 
 uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
 
+# 🔥 SAMPLE GENERATOR
+if st.button("✨ Generate Sample Clinical Notes"):
+    st.session_state["generated_notes"] = (
+        "Patient presents with lower back pain for 2 weeks. "
+        "Symptoms worsening. MRI recommended to evaluate underlying cause."
+    )
+
 if uploaded_file is not None:
     documents = uploaded_file.read().decode("utf-8")
     st.success(f"Uploaded file: {uploaded_file.name}")
 else:
-    documents = st.text_area("Or paste clinical notes here", value=documents_default)
+    documents = st.text_area(
+        "Or paste clinical notes here",
+        value=st.session_state.get("generated_notes", documents_default),
+        placeholder="Example: Patient presents with lower back pain for 2 weeks..."
+    )
+
+# 🔥 VALIDATION DISPLAY
+validation_status, validation_msg = validate_clinical_notes(documents)
+
+if validation_status == "valid":
+    st.success(validation_msg)
+elif validation_status == "weak":
+    st.warning(validation_msg)
+else:
+    st.error(validation_msg)
 
 evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
 
@@ -101,11 +140,13 @@ evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
 def evaluate(diagnosis, documents):
     issues = []
 
+    validation_status, _ = validate_clinical_notes(documents)
+
     if not diagnosis:
         issues.append("missing diagnosis")
 
-    if not documents or len(documents.strip()) < 1:
-        issues.append("missing clinical notes")
+    if validation_status == "invalid":
+        issues.append("invalid clinical notes")
 
     if "missing diagnosis" in issues:
         status = "Denied"
@@ -123,15 +164,15 @@ def evaluate(diagnosis, documents):
     else:
         explanation.append("✅ Diagnosis provided")
 
-    if "missing clinical notes" in issues:
-        explanation.append("❌ Missing clinical documentation")
+    if "invalid clinical notes" in issues:
+        explanation.append("❌ Clinical notes lack sufficient medical context")
     else:
         explanation.append("✅ Supporting documentation present")
 
     return status, explanation, confidence
 
 # -----------------------
-# 🔍 EVIDENCE FUNCTIONS (NEW)
+# EVIDENCE FUNCTIONS
 # -----------------------
 def extract_sentence(documents, keyword):
     sentences = documents.split(".")
@@ -151,15 +192,11 @@ def get_evidence(diagnosis, documents):
     if diagnosis:
         match = extract_sentence(documents, diagnosis)
         if match:
-            highlighted = highlight_text(match, diagnosis)
-            evidence["diagnosis"] = f"✅ Found: {highlighted}"
+            evidence["diagnosis"] = highlight_text(match, diagnosis)
         else:
-            evidence["diagnosis"] = "⚠️ Diagnosis not clearly supported in notes"
+            evidence["diagnosis"] = "Diagnosis not clearly supported"
 
-    if not documents or len(documents.strip()) == 0:
-        evidence["documents"] = "❌ No clinical notes provided"
-    else:
-        evidence["documents"] = "✅ Clinical notes provided"
+    evidence["documents"] = "Clinical notes present" if documents else "No notes"
 
     return evidence
 
@@ -185,31 +222,21 @@ if evaluate_clicked:
     st.markdown(f"### 🧾 Final Decision: **{final_status}**")
     st.write(f"Confidence Score: {confidence}%")
 
-    # -----------------------
-    # AI REASONING
-    # -----------------------
     st.markdown("### 🧠 AI Reasoning")
     for item in explanation:
         st.write(item)
 
-    # -----------------------
-    # 🔍 EVIDENCE DISPLAY (NEW)
-    # -----------------------
+    # 🔥 EVIDENCE
     evidence = get_evidence(diagnosis, documents)
 
     st.markdown("### 🔍 Supporting Evidence")
-
-    st.write("**Diagnosis Evidence:**")
     st.info(evidence.get("diagnosis", "Not available"))
-
-    st.write("**Documentation Check:**")
-    st.info(evidence.get("documents", "Not available"))
 
     # -----------------------
     # HUMAN-IN-THE-LOOP
     # -----------------------
     if final_status == "Needs Review":
-        st.warning("⚠️ This case requires human review")
+        st.warning("⚠️ Requires human review")
 
         human_decision = st.radio("Reviewer Decision:", ["Approve", "Deny"])
         reviewer_notes = st.text_area("Reviewer Notes")
@@ -217,21 +244,16 @@ if evaluate_clicked:
         if st.button("Submit Review"):
             st.success(f"Final Decision: {human_decision}")
 
-            review_data = {
+            save_review({
                 "patient": patient,
                 "ai_decision": final_status,
                 "confidence": confidence,
                 "human_decision": human_decision,
                 "notes": reviewer_notes
-            }
-
-            save_review(review_data)
+            })
 
     else:
-        if final_status == "Auto-Approved":
-            st.success("✅ Automatically approved based on high confidence")
-        else:
-            st.error("❌ Automatically denied due to insufficient data")
+        st.success("Automated decision completed")
 
     # -----------------------
     # METRICS
@@ -245,32 +267,6 @@ if evaluate_clicked:
         if "human_decision" in df.columns:
             override_rate = (df["ai_decision"] != df["human_decision"]).mean()
             st.write(f"Override Rate: {round(override_rate * 100, 2)}%")
-
-    # -----------------------
-    # REPORT
-    # -----------------------
-    report = f"""
-Patient Name: {patient}
-Procedure: {procedure}
-Diagnosis: {diagnosis}
-Insurance: {insurance}
-
-AI Decision: {final_status}
-Confidence: {confidence}%
-
-Explanation:
-{', '.join(explanation)}
-
-Evidence:
-{evidence}
-"""
-
-    st.download_button(
-        label="📄 Download Report",
-        data=report,
-        file_name="prior_authorization_report.txt",
-        mime="text/plain"
-    )
 
 # -----------------------
 # FOOTER
