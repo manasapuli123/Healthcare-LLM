@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+from datetime import datetime
 
 # -----------------------
 # PAGE CONFIG
@@ -26,25 +27,29 @@ st.markdown("## 🏥 Prior Authorization AI Agent")
 st.markdown("AI-powered workflow decision support with human review")
 
 # -----------------------
-# ROUTING LOGIC
+# THRESHOLDS (NEW)
 # -----------------------
+st.markdown("### ⚙️ Decision Thresholds")
+
+approve_threshold = st.slider("Auto-Approve Threshold", 50, 100, 85)
+review_threshold = st.slider("Review Threshold", 0, approve_threshold, 60)
+
 def route_decision(confidence):
-    if confidence >= 85:
+    if confidence >= approve_threshold:
         return "Auto-Approved"
-    elif confidence >= 60:
+    elif confidence >= review_threshold:
         return "Needs Review"
     else:
         return "Auto-Denied"
 
 # -----------------------
-# CLINICAL NOTE VALIDATION
+# VALIDATION
 # -----------------------
 def validate_clinical_notes(documents):
     if not documents or len(documents.strip()) < 20:
         return "invalid", "Clinical notes are too short"
 
     keywords = ["pain", "injury", "history", "symptoms", "diagnosis", "report"]
-
     score = sum(1 for word in keywords if word in documents.lower())
 
     if score >= 2:
@@ -55,7 +60,7 @@ def validate_clinical_notes(documents):
         return "invalid", "Notes lack clinical context"
 
 # -----------------------
-# SAMPLE SELECTOR
+# SCENARIO
 # -----------------------
 sample = st.selectbox(
     "Scenario",
@@ -94,18 +99,16 @@ else:
     documents_default = ""
 
 # -----------------------
-# 🔥 UPDATED SCENARIO LOGIC (FIXED)
+# STATE MANAGEMENT
 # -----------------------
 if "prev_sample" not in st.session_state:
     st.session_state["prev_sample"] = sample
     st.session_state["generated_notes"] = documents_default
 
 if sample != st.session_state["prev_sample"]:
-
     if sample in ["None", "Missing Info"]:
         st.session_state["generated_notes"] = ""
-
-    elif sample in ["Complete Case", "Invalid Case"]:
+    else:
         st.session_state["generated_notes"] = documents_default
 
     st.session_state["prev_sample"] = sample
@@ -122,21 +125,17 @@ insurance = st.text_input("Insurance", value=insurance_default)
 
 uploaded_file = st.file_uploader("Upload Clinical Notes (TXT)", type=["txt"])
 
-# SAMPLE GENERATOR
 if st.button("✨ Generate Sample Clinical Notes"):
     st.session_state["generated_notes"] = (
-        "Patient presents with lower back pain for 2 weeks. "
-        "Symptoms worsening. MRI recommended to evaluate underlying cause."
+        "Patient presents with lower back pain for 2 weeks. Symptoms worsening. MRI recommended."
     )
 
 if uploaded_file is not None:
     documents = uploaded_file.read().decode("utf-8")
-    st.success(f"Uploaded file: {uploaded_file.name}")
 else:
     documents = st.text_area(
-        "Or paste clinical notes here",
-        value=st.session_state.get("generated_notes", ""),
-        placeholder="Example: Patient presents with lower back pain for 2 weeks..."
+        "Clinical Notes",
+        value=st.session_state.get("generated_notes", "")
     )
 
 # -----------------------
@@ -151,86 +150,100 @@ elif validation_status == "weak":
 else:
     st.error(validation_msg)
 
-evaluate_clicked = st.button("🚀 Evaluate Request", use_container_width=True)
+evaluate_clicked = st.button("🚀 Evaluate Request")
 
 # -----------------------
-# CORE AI LOGIC
+# EVALUATION (UPDATED)
 # -----------------------
 def evaluate(diagnosis, documents):
+    score = 0
+    breakdown = {}
     issues = []
 
     validation_status, _ = validate_clinical_notes(documents)
 
     if not diagnosis:
+        breakdown["Diagnosis"] = -30
         issues.append("missing diagnosis")
+    else:
+        breakdown["Diagnosis"] = +30
+        score += 30
 
     if validation_status == "invalid":
+        breakdown["Clinical Notes"] = -25
         issues.append("invalid clinical notes")
+    elif validation_status == "weak":
+        breakdown["Clinical Notes"] = -10
+        score += 10
+    else:
+        breakdown["Clinical Notes"] = +25
+        score += 25
+
+    confidence = max(0, min(100, score))
 
     if "missing diagnosis" in issues:
         status = "Denied"
-        confidence = 40
     elif issues:
         status = "Pending Information"
-        confidence = 65
     else:
         status = "Approved"
-        confidence = 90
 
-    explanation = []
-    if "missing diagnosis" in issues:
-        explanation.append("❌ Missing valid diagnosis")
-    else:
-        explanation.append("✅ Diagnosis provided")
-
-    if "invalid clinical notes" in issues:
-        explanation.append("❌ Clinical notes lack sufficient medical context")
-    else:
-        explanation.append("✅ Supporting documentation present")
-
-    return status, explanation, confidence
+    return status, confidence, breakdown
 
 # -----------------------
 # OUTPUT
 # -----------------------
 if evaluate_clicked:
-    status, explanation, confidence = evaluate(diagnosis, documents)
+    status, confidence, breakdown = evaluate(diagnosis, documents)
     final_status = route_decision(confidence)
 
     st.markdown(f"### 🧾 Final Decision: **{final_status}**")
     st.write(f"Confidence Score: {confidence}%")
 
-    st.markdown("### 🧠 AI Reasoning")
-    for item in explanation:
-        st.write(item)
+    # 🔥 Confidence Breakdown
+    st.markdown("### 📊 Confidence Breakdown")
+    for k, v in breakdown.items():
+        st.write(f"{k}: {v:+}")
 
+    # -----------------------
+    # HUMAN-IN-THE-LOOP
+    # -----------------------
     if final_status == "Needs Review":
-        st.warning("⚠️ Requires human review")
-
         human_decision = st.radio("Reviewer Decision:", ["Approve", "Deny"])
-        reviewer_notes = st.text_area("Reviewer Notes")
+        notes = st.text_area("Reviewer Notes")
 
         if st.button("Submit Review"):
-            st.success(f"Final Decision: {human_decision}")
-
-            pd.DataFrame([{
+            record = {
+                "timestamp": datetime.now(),
                 "patient": patient,
                 "ai_decision": final_status,
                 "confidence": confidence,
                 "human_decision": human_decision,
-                "notes": reviewer_notes
-            }]).to_csv(
+                "notes": notes
+            }
+
+            pd.DataFrame([record]).to_csv(
                 "reviews.csv",
                 mode="a",
                 header=not os.path.exists("reviews.csv"),
                 index=False
             )
 
+            st.success("Review saved")
+
     else:
         st.success("Automated decision completed")
+
+# -----------------------
+# AUDIT TRAIL (NEW)
+# -----------------------
+if os.path.exists("reviews.csv"):
+    st.markdown("### 📜 Decision Audit Trail")
+    df = pd.read_csv("reviews.csv")
+    st.dataframe(df.tail(10))
 
 # -----------------------
 # FOOTER
 # -----------------------
 st.markdown("---")
-st.caption("⚠️ Prototype for demonstration purposes only. Not for clinical use.")
+st.caption("⚠️ Prototype for demonstration purposes only.")
