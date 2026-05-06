@@ -12,9 +12,30 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    /* App background */
     .stApp {
         background-color: #E6F2FF;
     }
+
+    /* Text input fields */
+    input, textarea {
+        background-color: white !important;
+    }
+
+    /* Streamlit specific input containers */
+    .stTextInput input,
+    .stTextArea textarea,
+    .stSelectbox div[data-baseweb="select"] > div {
+        background-color: white !important;
+    }
+
+    /* File uploader */
+    .stFileUploader {
+        background-color: white !important;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
