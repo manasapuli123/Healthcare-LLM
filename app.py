@@ -21,14 +21,53 @@ st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assist
 # ---------------------------
 # STYLING
 # ---------------------------
+
 st.markdown("""
 <style>
 
-/* ---------- BASE UI ---------- */
+/* ---------- REMOVE DEFAULT STREAMLIT SPACING ---------- */
+
+html, body, [class*="css"] {
+    margin: 0;
+    padding: 0;
+}
+
+.block-container {
+    padding-top: 1rem;
+    padding-bottom: 0rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* Hide Streamlit Header */
+
+header {
+    visibility: hidden;
+    height: 0px;
+}
+
+/* Hide Footer */
+
+footer {
+    visibility: hidden;
+    height: 0px;
+}
+
+/* Hide Main Menu */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+/* ---------- MAIN APP ---------- */
 
 .stApp {
     background-color:#eaf7f4;
+    margin-top: -70px;
+    padding-bottom: 0px;
 }
+
+/* ---------- HEADER ---------- */
 
 .header {
     background-color:#3aafa9;
@@ -36,9 +75,10 @@ st.markdown("""
     border-radius:10px;
     color:white;
     font-weight:bold;
+    margin-top:0px;
 }
 
-/* Buttons */
+/* ---------- BUTTONS ---------- */
 
 .stButton>button {
     background-color:#3aafa9;
@@ -53,7 +93,7 @@ st.markdown("""
     background-color:#2f8f89;
 }
 
-/* Chat bubbles */
+/* ---------- CHAT BUBBLES ---------- */
 
 .user-msg {
     background:#DCF8C6;
@@ -149,12 +189,6 @@ textarea {
 /* Upload icon */
 
 [data-testid="stFileUploader"] svg {
-    color: white !important;
-}
-
-/* Top Streamlit toolbar (>>, Share, Deploy icons) */
-
-header, header * {
     color: white !important;
 }
 
