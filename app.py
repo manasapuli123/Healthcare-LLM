@@ -13,7 +13,8 @@ from sentence_transformers import SentenceTransformer
 st.set_page_config(
     page_title="Clinical AI Assistant",
     page_icon="🩺",
-    layout="centered"
+    layout="wide"
+    initial_sidebar_state="expanded"
 )
 
 st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assistant.")
