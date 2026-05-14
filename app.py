@@ -26,21 +26,24 @@ st.info("Tip: Click **Load Sample Clinical Notes** to quickly test the AI assist
 st.markdown("""
 <style>
 
-/* ---------- REMOVE DEFAULT STREAMLIT SPACING ---------- */
+/* ---------- GLOBAL ---------- */
 
 html, body, [class*="css"] {
     margin: 0;
     padding: 0;
+    font-family: 'Inter', sans-serif;
 }
 
+/* ---------- MAIN CONTAINER ---------- */
+
 .block-container {
-    padding-top: 2rem !important;
-    padding-bottom: 0rem;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1rem !important;
     padding-left: 2rem;
     padding-right: 2rem;
 }
 
-/* Remove top toolbar spacing without hiding sidebar */
+/* ---------- HEADER / TOOLBAR ---------- */
 
 [data-testid="stHeader"] {
     background: transparent;
@@ -50,15 +53,14 @@ html, body, [class*="css"] {
     right: 1rem;
 }
 
-/* Hide Footer */
+/* ---------- FOOTER ---------- */
 
 footer {
     visibility: hidden;
     height: 0px;
 }
 
-
-/* ---------- MAIN APP ---------- */
+/* ---------- APP BACKGROUND ---------- */
 
 .stApp {
     background-color:#eaf7f4;
@@ -68,28 +70,40 @@ footer {
     background-color:#eaf7f4;
 }
 
-[data-testid="stVerticalBlock"] {
-    gap: 0rem;
+/* ---------- SIDEBAR ---------- */
+
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #dff3ef, #eef9f7);
+    padding-top: 20px;
 }
 
-section.main > div {
-    padding-bottom: 0rem;
+[data-testid="stSidebar"] * {
+    color: #1a1a1a;
 }
 
-.block-container {
-    padding-bottom: 0rem !important;
+/* ---------- MAIN CARD ---------- */
+
+.main-card {
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 /* ---------- HEADER ---------- */
 
 .header {
-    background-color:#3aafa9;
-    padding:15px;
-    border-radius:10px;
+    background: linear-gradient(90deg, #3aafa9, #58c7c2);
+    padding:18px;
+    border-radius:14px;
     color:white;
-    font-weight:bold;
+    font-weight:600;
+    font-size:22px;
     margin-top:0px;
-    margin-bottom:30px;
+    margin-bottom:25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* ---------- BUTTONS ---------- */
@@ -97,14 +111,55 @@ section.main > div {
 .stButton>button {
     background-color:#3aafa9;
     color:white;
-    border-radius:8px;
+    border-radius:10px;
     border:none;
-    padding:10px 16px;
-    font-weight:500;
+    padding:10px 18px;
+    font-weight:600;
+    transition: all 0.2s ease;
 }
 
 .stButton>button:hover {
     background-color:#2f8f89;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(58,175,169,0.25);
+}
+
+.stButton {
+    margin-top: 5px;
+}
+
+/* ---------- FILE UPLOADER ---------- */
+
+[data-testid="stFileUploader"] {
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #dfe6e9;
+}
+
+/* ---------- TEXT AREA ---------- */
+
+[data-testid="stTextArea"] textarea {
+    border: 1px solid #d0d7de !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    padding: 14px !important;
+    font-size: 15px !important;
+    background-color: #fcfcfc !important;
+}
+
+[data-testid="stTextArea"] {
+    margin-bottom: 20px;
+}
+
+/* ---------- CHAT INPUT ---------- */
+
+[data-testid="stChatInput"] {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #dfe6e9;
+    padding: 6px;
+    margin-top: 20px;
 }
 
 /* ---------- CHAT BUBBLES ---------- */
@@ -112,37 +167,30 @@ section.main > div {
 .user-msg {
     background:#DCF8C6;
     padding:12px;
-    border-radius:12px;
-    margin:8px;
+    border-radius:14px;
+    margin:10px;
     text-align:right;
     color:black;
     max-width:70%;
     margin-left:auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .bot-msg {
     background:#F1F0F0;
     padding:12px;
-    border-radius:12px;
-    margin:8px;
+    border-radius:14px;
+    margin:10px;
     color:black;
     max-width:70%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
-/* ---------- TEXT AREA SPACING ---------- */
+/* ---------- ALERTS ---------- */
 
-[data-testid="stTextArea"] textarea {
-    border: 1px solid #d0d7de !important;
-    border-radius: 10px !important;
-    box-shadow: none !important;
-}
-
-[data-testid="stTextArea"] {
-    margin-bottom: 20px;
-}
-
-.stButton {
-    margin-top: 5px;
+[data-testid="stAlert"] {
+    border-radius: 12px;
+    border: none;
 }
 
 /* ---------- LIGHT MODE ---------- */
@@ -171,25 +219,17 @@ textarea {
 
 @media (prefers-color-scheme: dark) {
 
-/* Global text */
-
 body, p, span, div, label {
     color: white !important;
 }
-
-/* Text area */
 
 textarea {
     color: white !important;
 }
 
-/* Chat input */
-
 [data-testid="stChatInput"] textarea {
     color: white !important;
 }
-
-/* Drag & Drop uploader */
 
 [data-testid="stFileUploaderDropzone"] {
     color: white !important;
@@ -203,26 +243,18 @@ textarea {
     color: white !important;
 }
 
-/* Browse files button */
-
 [data-testid="stFileUploader"] button {
     color: white !important;
     border-color: white !important;
 }
 
-/* Upload helper text */
-
 [data-testid="stFileUploader"] small {
     color: white !important;
 }
 
-/* Upload icon */
-
 [data-testid="stFileUploader"] svg {
     color: white !important;
 }
-
-/* Chat placeholder */
 
 [data-testid="stChatInput"] input::placeholder {
     color: white !important;
