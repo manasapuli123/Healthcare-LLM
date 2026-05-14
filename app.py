@@ -277,17 +277,23 @@ chunks, index = load_knowledge()
 # ---------------------------
 # SIDEBAR
 # ---------------------------
-
 st.sidebar.title("🩺 Clinical AI Assistant")
 
-st.sidebar.write("""
-Upload patient notes and chat with the assistant.
+st.sidebar.markdown("""
+Transforming clinical notes into actionable insights.
 
-Powered by:
-• FAISS RAG  
-• OpenAI LLM
+This AI-powered assistant helps summarize patient records, surface key medical information, and support faster clinical decision-making through conversational workflows and intelligent document analysis.
+
+### ✨ Features
+- Clinical note summarization
+- Conversational patient Q&A
+- PDF medical report analysis
+- Retrieval-Augmented Generation (RAG)
+- AI-assisted workflow support
+
+### ⚠️ Disclaimer
+AI-generated responses are for informational purposes only and should be clinically validated.
 """)
-
 # ---------------------------
 # HEADER
 # ---------------------------
