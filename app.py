@@ -63,8 +63,22 @@ footer {
 
 .stApp {
     background-color:#eaf7f4;
-    margin-top: -70px;
-    padding-bottom: 0px;
+}
+
+[data-testid="stAppViewContainer"] {
+    background-color:#eaf7f4;
+}
+
+[data-testid="stVerticalBlock"] {
+    gap: 0rem;
+}
+
+section.main > div {
+    padding-bottom: 0rem;
+}
+
+.block-container {
+    padding-bottom: 0rem !important;
 }
 
 /* ---------- HEADER ---------- */
