@@ -40,13 +40,6 @@ html, body, [class*="css"] {
     padding-right: 2rem;
 }
 
-/* Hide Streamlit Header */
-
-header {
-    visibility: hidden;
-    height: 0px;
-}
-
 /* Hide Footer */
 
 footer {
@@ -54,11 +47,6 @@ footer {
     height: 0px;
 }
 
-/* Hide Main Menu */
-
-#MainMenu {
-    visibility: hidden;
-}
 
 /* ---------- MAIN APP ---------- */
 
