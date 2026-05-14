@@ -130,6 +130,22 @@ section.main > div {
     max-width:70%;
 }
 
+/* ---------- TEXT AREA SPACING ---------- */
+
+[data-testid="stTextArea"] textarea {
+    border: 1px solid #d0d7de !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stTextArea"] {
+    margin-bottom: 20px;
+}
+
+.stButton {
+    margin-top: 5px;
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 @media (prefers-color-scheme: light) {
