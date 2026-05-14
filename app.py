@@ -34,10 +34,20 @@ html, body, [class*="css"] {
 }
 
 .block-container {
-    padding-top: 1rem;
+    padding-top: 0rem !important;
     padding-bottom: 0rem;
     padding-left: 2rem;
     padding-right: 2rem;
+}
+
+/* Remove top toolbar spacing without hiding sidebar */
+
+[data-testid="stHeader"] {
+    background: transparent;
+}
+
+[data-testid="stToolbar"] {
+    right: 1rem;
 }
 
 /* Hide Footer */
