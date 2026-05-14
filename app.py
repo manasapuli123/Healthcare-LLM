@@ -333,7 +333,7 @@ AI-generated responses are for informational purposes only and should be clinica
 st.markdown(
 """
 <div class="header">
-👩‍⚕️ Medical AI Assistant
+👩‍⚕️ Clinical AI Assistant
 </div>
 """,
 unsafe_allow_html=True
