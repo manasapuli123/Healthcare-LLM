@@ -90,7 +90,7 @@ section.main > div {
     color:white;
     font-weight:bold;
     margin-top:0px;
-    margin-bottom:20px;
+    margin-bottom:30px;
 }
 
 /* ---------- BUTTONS ---------- */
