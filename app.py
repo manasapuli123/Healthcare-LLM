@@ -5,6 +5,7 @@ from pypdf import PdfReader
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
+import io
 
 # ---------------------------
 # PAGE CONFIG
@@ -322,10 +323,12 @@ This AI-powered assistant helps summarize patient records, surface key medical i
 - PDF medical report analysis
 - Retrieval-Augmented Generation (RAG)
 - AI-assisted workflow support
+- 🎙️ Voice input for clinical notes
 
 ### ⚠️ Disclaimer
 AI-generated responses are for informational purposes only and should be clinically validated.
 """)
+
 # ---------------------------
 # HEADER
 # ---------------------------
@@ -390,6 +393,51 @@ if uploaded_file:
             text += page_text
 
     st.session_state.clinical_notes = text
+
+# ---------------------------
+# VOICE INPUT
+# ---------------------------
+
+st.markdown("#### 🎙️ Or Record Clinical Notes by Voice")
+
+try:
+    from streamlit_mic_recorder import mic_recorder
+
+    audio = mic_recorder(
+        start_prompt="🔴 Start Recording",
+        stop_prompt="⏹️ Stop Recording",
+        just_once=True,
+        use_container_width=True,
+        key="voice_recorder"
+    )
+
+    if audio:
+        with st.spinner("Transcribing audio..."):
+            audio_bytes = audio["bytes"]
+            audio_file = io.BytesIO(audio_bytes)
+            audio_file.name = "recording.wav"
+
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+            )
+
+            transcribed_text = transcript.text
+            st.success("✅ Transcription complete!")
+            st.session_state.clinical_notes = (
+                st.session_state.clinical_notes + "\n" + transcribed_text
+            ).strip()
+            st.rerun()
+
+except ImportError:
+    st.warning(
+        "Voice input requires `streamlit-mic-recorder`. "
+        "Install it with: `pip install streamlit-mic-recorder`"
+    )
+
+# ---------------------------
+# CLINICAL NOTES TEXT AREA
+# ---------------------------
 
 clinical_notes = st.text_area(
     "Paste Clinical Notes",
